@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Devin AI — Deep Dive</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0e13;
+  --surface: #14171e;
+  --surface2: #1a1e28;
+  --border: #262b38;
+  --text: #e2e4ea;
+  --text-dim: #8a8f9e;
+  --accent: #6c5ce7;
+  --accent2: #00cec9;
+  --accent3: #fd79a8;
+  --warn: #fdcb6e;
+  --success: #00b894;
+  --code-bg: #0d1017;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+.container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+/* Header */
+.hero {
+  position: relative;
+  padding: 5rem 0 4rem;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -20%;
+  width: 140%;
+  height: 200%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(108,92,231,0.08) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 30%, rgba(0,206,201,0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  background: linear-gradient(135deg, var(--text) 40%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero .subtitle {
+  font-size: 1.15rem;
+  color: var(--text-dim);
+  margin-top: 1rem;
+  max-width: 700px;
+  font-weight: 300;
+}
+.badge {
+  display: inline-block;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--accent2);
+  margin-bottom: 1.2rem;
+}
+
+/* Navigation */
+.toc {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(12,14,19,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0.7rem 0;
+  overflow-x: auto;
+}
+.toc-inner {
+  display: flex;
+  gap: 0.3rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+.toc a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-family: 'JetBrains Mono', monospace;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.toc a:hover { background: var(--surface2); color: var(--text); }
+
+/* Section */
+section { padding: 3.5rem 0 2rem; }
+section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.9rem;
+  margin-bottom: 0.4rem;
+  position: relative;
+  display: inline-block;
+}
+section h2::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 40px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+.section-lead {
+  color: var(--text-dim);
+  margin: 1rem 0 2rem;
+  font-size: 1.02rem;
+  max-width: 750px;
+}
+
+/* Architecture Diagram */
+.arch-diagram {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+.arch-diagram svg {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Cards Grid */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; margin: 1.5rem 0; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.6rem;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 1rem;
+}
+.card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
+.card p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; }
+
+/* Comparison Table */
+.table-wrap {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+th {
+  background: var(--surface2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 0.9rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+td {
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-dim);
+}
+tr:last-child td { border-bottom: none; }
+td:first-child { color: var(--text); font-weight: 600; white-space: nowrap; }
+.highlight-devin { color: var(--accent3); }
+.highlight-claude { color: var(--accent2); }
+
+/* Flow Steps */
+.flow-steps { position: relative; margin: 2rem 0; padding-left: 2rem; }
+.flow-steps::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3));
+  border-radius: 2px;
+}
+.step {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-left: 1.6rem;
+}
+.step::before {
+  content: '';
+  position: absolute;
+  left: -2rem;
+  top: 0.45rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--bg);
+}
+.step-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 0.3rem;
+}
+.step h3 { font-size: 1.05rem; margin-bottom: 0.3rem; }
+.step p { color: var(--text-dim); font-size: 0.9rem; }
+
+/* Callout Boxes */
+.callout {
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.5rem 0;
+  border-left: 3px solid;
+  font-size: 0.92rem;
+}
+.callout-warn { background: rgba(253,203,110,0.06); border-color: var(--warn); }
+.callout-danger { background: rgba(253,121,168,0.06); border-color: var(--accent3); }
+.callout-info { background: rgba(108,92,231,0.06); border-color: var(--accent); }
+.callout-success { background: rgba(0,184,148,0.06); border-color: var(--success); }
+.callout-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.5rem;
+}
+.callout-warn .callout-title { color: var(--warn); }
+.callout-danger .callout-title { color: var(--accent3); }
+.callout-info .callout-title { color: var(--accent); }
+.callout-success .callout-title { color: var(--success); }
+.callout p { color: var(--text-dim); line-height: 1.65; }
+
+/* Tags */
+.tag-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1rem 0; }
+.tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+/* Sub-heading */
+h4 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--accent2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin: 2rem 0 0.8rem;
+}
+
+/* Prose helpers */
+.prose { max-width: 800px; }
+.prose p { margin-bottom: 1rem; color: var(--text-dim); }
+.prose strong { color: var(--text); }
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 0;
+  margin-top: 3rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+  .hero { padding: 3rem 0 2rem; }
+  section { padding: 2.5rem 0 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <div class="badge">cognition labs · autonomous agent · 2024–2026</div>
+    <h1>Devin AI<br>Architecture Deep Dive</h1>
+    <p class="subtitle">Components, end-to-end flow, comparison with Claude / Claude Code, trade-offs, gotchas, and everything you need to form your own opinion.</p>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-inner">
+    <a href="#what">What Is It</a>
+    <a href="#arch">Architecture</a>
+    <a href="#components">Components</a>
+    <a href="#flow">E2E Flow</a>
+    <a href="#compare">Comparison</a>
+    <a href="#tradeoffs">Trade-offs</a>
+    <a href="#gotchas">Gotchas</a>
+    <a href="#when">When to Use</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ─── WHAT IS IT ─── -->
+<section id="what">
+  <h2>What Is Devin AI?</h2>
+  <div class="prose section-lead">
+    <p>Devin is an <strong>autonomous AI software engineer</strong> built by Cognition Labs. Unlike copilot-style assistants that autocomplete code inside an editor, Devin is a full agent — it plans, writes, tests, debugs, and submits PRs with minimal human intervention. It runs inside its own sandboxed cloud environment (the "Devbox") equipped with a shell, code editor, and browser.</p>
+    <p>Devin 2.0 (April 2025) dropped pricing from $500/month to $20/month, introduced Interactive Planning, Devin Search, Devin Wiki, and multi-agent parallel sessions. By late 2025, it had merged hundreds of thousands of PRs across thousands of companies including Goldman Sachs, Santander, and Nubank.</p>
+  </div>
+  <div class="tag-row">
+    <span class="tag">compound AI system</span>
+    <span class="tag">multi-model swarm</span>
+    <span class="tag">sandboxed execution</span>
+    <span class="tag">async delegation</span>
+    <span class="tag">SWE-bench 13.86%</span>
+    <span class="tag">~$4B valuation</span>
+  </div>
+</section>
+
+<!-- ─── ARCHITECTURE DIAGRAM ─── -->
+<section id="arch">
+  <h2>High-Level Architecture</h2>
+  <p class="section-lead">Devin is a <strong>compound AI system</strong> — not a single model, but a swarm of specialized models orchestrating a workflow, split across two deployment zones.</p>
+
+  <div class="arch-diagram">
+    <svg viewBox="0 0 960 520" xmlns="http://www.w3.org/2000/svg" font-family="'Source Sans 3', sans-serif">
+      <!-- Background zones -->
+      <rect x="20" y="20" width="920" height="180" rx="14" fill="#181c26" stroke="#262b38" stroke-width="1.5"/>
+      <text x="40" y="52" font-size="11" fill="#6c5ce7" font-family="'JetBrains Mono', monospace" font-weight="600" letter-spacing="0.08em">COGNITION CLOUD — "THE BRAIN" (stateless inference)</text>
+
+      <rect x="20" y="220" width="920" height="170" rx="14" fill="#141820" stroke="#262b38" stroke-width="1.5"/>
+      <text x="40" y="252" font-size="11" fill="#00cec9" font-family="'JetBrains Mono', monospace" font-weight="600" letter-spacing="0.08em">DEVBOX — SANDBOXED EXECUTION (per-session)</text>
+
+      <rect x="20" y="410" width="920" height="90" rx="14" fill="#12151c" stroke="#262b38" stroke-width="1.5"/>
+      <text x="40" y="442" font-size="11" fill="#fd79a8" font-family="'JetBrains Mono', monospace" font-weight="600" letter-spacing="0.08em">EXTERNAL INTEGRATIONS</text>
+
+      <!-- Brain boxes -->
+      <rect x="50" y="70" width="155" height="110" rx="10" fill="#1e2230" stroke="#6c5ce7" stroke-width="1"/>
+      <text x="128" y="100" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Planner</text>
+      <text x="128" y="120" text-anchor="middle" font-size="10" fill="#8a8f9e">High-reasoning LLM</text>
+      <text x="128" y="136" text-anchor="middle" font-size="10" fill="#8a8f9e">Strategy & decomposition</text>
+      <text x="128" y="152" text-anchor="middle" font-size="10" fill="#8a8f9e">Interactive Planning</text>
+      <text x="128" y="168" text-anchor="middle" font-size="9" fill="#6c5ce7" font-family="'JetBrains Mono', monospace">devin-planner</text>
+
+      <rect x="230" y="70" width="155" height="110" rx="10" fill="#1e2230" stroke="#6c5ce7" stroke-width="1"/>
+      <text x="308" y="100" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Coder</text>
+      <text x="308" y="120" text-anchor="middle" font-size="10" fill="#8a8f9e">Code-specialized LLM</text>
+      <text x="308" y="136" text-anchor="middle" font-size="10" fill="#8a8f9e">Multi-lang generation</text>
+      <text x="308" y="152" text-anchor="middle" font-size="10" fill="#8a8f9e">Context-aware edits</text>
+      <text x="308" y="168" text-anchor="middle" font-size="9" fill="#6c5ce7" font-family="'JetBrains Mono', monospace">code-gen model</text>
+
+      <rect x="410" y="70" width="155" height="110" rx="10" fill="#1e2230" stroke="#6c5ce7" stroke-width="1"/>
+      <text x="488" y="100" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Critic</text>
+      <text x="488" y="120" text-anchor="middle" font-size="10" fill="#8a8f9e">Adversarial reviewer</text>
+      <text x="488" y="136" text-anchor="middle" font-size="10" fill="#8a8f9e">Security & logic audit</text>
+      <text x="488" y="152" text-anchor="middle" font-size="10" fill="#8a8f9e">Confidence scoring</text>
+      <text x="488" y="168" text-anchor="middle" font-size="9" fill="#6c5ce7" font-family="'JetBrains Mono', monospace">review model</text>
+
+      <rect x="590" y="70" width="155" height="110" rx="10" fill="#1e2230" stroke="#6c5ce7" stroke-width="1"/>
+      <text x="668" y="100" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Browser Agent</text>
+      <text x="668" y="120" text-anchor="middle" font-size="10" fill="#8a8f9e">Web scraping agent</text>
+      <text x="668" y="136" text-anchor="middle" font-size="10" fill="#8a8f9e">Doc synthesis</text>
+      <text x="668" y="152" text-anchor="middle" font-size="10" fill="#8a8f9e">Search & learn</text>
+      <text x="668" y="168" text-anchor="middle" font-size="9" fill="#6c5ce7" font-family="'JetBrains Mono', monospace">browser model</text>
+
+      <rect x="770" y="70" width="155" height="110" rx="10" fill="#1e2230" stroke="#6c5ce7" stroke-width="1"/>
+      <text x="848" y="100" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Orchestrator</text>
+      <text x="848" y="120" text-anchor="middle" font-size="10" fill="#8a8f9e">Multi-agent dispatch</text>
+      <text x="848" y="136" text-anchor="middle" font-size="10" fill="#8a8f9e">Session management</text>
+      <text x="848" y="152" text-anchor="middle" font-size="10" fill="#8a8f9e">Context memory</text>
+      <text x="848" y="168" text-anchor="middle" font-size="9" fill="#6c5ce7" font-family="'JetBrains Mono', monospace">coordinator</text>
+
+      <!-- Devbox boxes -->
+      <rect x="50" y="270" width="180" height="100" rx="10" fill="#172028" stroke="#00cec9" stroke-width="1"/>
+      <text x="140" y="298" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Shell / Terminal</text>
+      <text x="140" y="318" text-anchor="middle" font-size="10" fill="#8a8f9e">npm, pip, git, docker</text>
+      <text x="140" y="338" text-anchor="middle" font-size="10" fill="#8a8f9e">Build & test execution</text>
+      <text x="140" y="355" text-anchor="middle" font-size="10" fill="#8a8f9e">Environment setup</text>
+
+      <rect x="260" y="270" width="180" height="100" rx="10" fill="#172028" stroke="#00cec9" stroke-width="1"/>
+      <text x="350" y="298" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Code Editor</text>
+      <text x="350" y="318" text-anchor="middle" font-size="10" fill="#8a8f9e">Multi-file editing</text>
+      <text x="350" y="338" text-anchor="middle" font-size="10" fill="#8a8f9e">LSP integration</text>
+      <text x="350" y="355" text-anchor="middle" font-size="10" fill="#8a8f9e">Devin IDE (v2.0)</text>
+
+      <rect x="470" y="270" width="180" height="100" rx="10" fill="#172028" stroke="#00cec9" stroke-width="1"/>
+      <text x="560" y="298" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Browser</text>
+      <text x="560" y="318" text-anchor="middle" font-size="10" fill="#8a8f9e">Web navigation</text>
+      <text x="560" y="338" text-anchor="middle" font-size="10" fill="#8a8f9e">Doc lookup</text>
+      <text x="560" y="355" text-anchor="middle" font-size="10" fill="#8a8f9e">Visual verification</text>
+
+      <rect x="680" y="270" width="245" height="100" rx="10" fill="#172028" stroke="#00cec9" stroke-width="1"/>
+      <text x="802" y="298" text-anchor="middle" font-size="13" fill="#e2e4ea" font-weight="600">Repo Index / Wiki</text>
+      <text x="802" y="318" text-anchor="middle" font-size="10" fill="#8a8f9e">Auto-generated codebase docs</text>
+      <text x="802" y="338" text-anchor="middle" font-size="10" fill="#8a8f9e">Devin Search (agentic Q&A)</text>
+      <text x="802" y="355" text-anchor="middle" font-size="10" fill="#8a8f9e">Architecture diagrams</text>
+
+      <!-- External integrations -->
+      <rect x="50" y="455" width="130" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="115" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">GitHub / GitLab</text>
+
+      <rect x="200" y="455" width="100" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="250" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">Slack</text>
+
+      <rect x="320" y="455" width="100" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="370" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">Jira / Linear</text>
+
+      <rect x="440" y="455" width="100" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="490" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">CI / CD</text>
+
+      <rect x="560" y="455" width="140" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="630" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">AWS / Azure VPC</text>
+
+      <rect x="720" y="455" width="100" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="770" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">SSO / SAML</text>
+
+      <rect x="840" y="455" width="85" height="36" rx="8" fill="#1a1520" stroke="#fd79a8" stroke-width="1"/>
+      <text x="882" y="478" text-anchor="middle" font-size="11" fill="#e2e4ea">VS Code</text>
+
+      <!-- Arrows Brain → Devbox -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+          <polygon points="0 0, 8 3, 0 6" fill="#5a5f72"/>
+        </marker>
+      </defs>
+      <line x1="128" y1="180" x2="140" y2="270" stroke="#5a5f72" stroke-width="1.2" marker-end="url(#arr)"/>
+      <line x1="308" y1="180" x2="350" y2="270" stroke="#5a5f72" stroke-width="1.2" marker-end="url(#arr)"/>
+      <line x1="668" y1="180" x2="560" y2="270" stroke="#5a5f72" stroke-width="1.2" marker-end="url(#arr)"/>
+      <line x1="848" y1="180" x2="802" y2="270" stroke="#5a5f72" stroke-width="1.2" marker-end="url(#arr)"/>
+
+      <!-- Arrows Devbox → Integrations -->
+      <line x1="140" y1="370" x2="115" y2="455" stroke="#5a5f72" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+      <line x1="350" y1="370" x2="370" y2="455" stroke="#5a5f72" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+      <line x1="560" y1="370" x2="490" y2="455" stroke="#5a5f72" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+      <line x1="802" y1="370" x2="630" y2="455" stroke="#5a5f72" stroke-width="1" marker-end="url(#arr)" stroke-dasharray="4,3"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ─── COMPONENTS ─── -->
+<section id="components">
+  <h2>Core Components Explained</h2>
+  <p class="section-lead">Each component serves a distinct role in the compound AI pipeline.</p>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon" style="background:rgba(108,92,231,0.15);">🧠</div>
+      <h3>The Planner</h3>
+      <p>A high-reasoning LLM (Devin-Planner) that takes a natural language prompt and decomposes it into a step-by-step strategy — file architecture, tool selection, estimated timelines. In Devin 2.0, this became "Interactive Planning" where users can modify the plan before execution begins.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(0,206,201,0.15);">⌨️</div>
+      <h3>The Coder</h3>
+      <p>A code-specialized model trained on high-quality code tokens. Handles multi-language generation, context-aware editing across files, and pattern replication from existing codebases. Works closely with the editor tool in the Devbox.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(253,121,168,0.15);">🔍</div>
+      <h3>The Critic</h3>
+      <p>An adversarial review model that inspects generated code for security vulnerabilities, logic errors, and style violations before anything is committed. Feeds confidence scores back to the orchestrator — low confidence triggers a "clarification request" to the human.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(253,203,110,0.15);">🌐</div>
+      <h3>The Browser Agent</h3>
+      <p>An agent designed to navigate the web, scrape documentation, look up Stack Overflow / official docs, and synthesize information. Lets Devin learn new libraries at runtime rather than relying solely on training data.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(0,184,148,0.15);">🔄</div>
+      <h3>The Orchestrator</h3>
+      <p>Coordinates the swarm. Dispatches subtasks to the right specialist model, manages session state, routes outputs between Planner → Coder → Critic loops, and handles multi-agent parallel execution in Devin 2.0.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon" style="background:rgba(108,92,231,0.15);">📦</div>
+      <h3>The Devbox (Sandbox)</h3>
+      <p>A secure, isolated VM per session with a shell, code editor, and browser. This is where code actually runs. Cannot access production databases unless credentials are explicitly provided. Enterprise deployments can run the Devbox in customer VPCs via AWS PrivateLink.</p>
+    </div>
+  </div>
+
+  <h4>Deployment Models</h4>
+  <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
+    <div class="card">
+      <h3>Enterprise SaaS</h3>
+      <p>Both Brain + Devbox in Cognition's cloud. Multi-tenant, encrypted at rest and in transit. Each session is isolated.</p>
+    </div>
+    <div class="card">
+      <h3>Customer Dedicated SaaS</h3>
+      <p>Single-tenant VPC. Devbox runs in a customer-isolated environment. Connected via AWS PrivateLink or IPSec tunnel.</p>
+    </div>
+    <div class="card">
+      <h3>Customer VPC</h3>
+      <p>Devbox runs inside your own VPC (AWS / Azure). Brain still calls Cognition's cloud. Maximum data residency control.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── E2E FLOW ─── -->
+<section id="flow">
+  <h2>End-to-End Flow</h2>
+  <p class="section-lead">What happens from the moment you type a prompt to a merged PR.</p>
+
+  <div class="flow-steps">
+    <div class="step">
+      <div class="step-num">STEP 01</div>
+      <h3>Task Input</h3>
+      <p>User gives Devin a natural language instruction — via the web UI, Slack (@Devin), or an IDE extension. Example: "Build a task management API using FastAPI + PostgreSQL with CRUD endpoints and auth."</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 02</div>
+      <h3>Interactive Planning</h3>
+      <p>The <strong>Planner</strong> model researches the codebase (via the Repo Index), develops a detailed plan with steps, files, tools, and architecture. User reviews, modifies, or approves the plan before execution begins.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 03</div>
+      <h3>Environment Setup</h3>
+      <p>A fresh <strong>Devbox</strong> sandbox spins up. Devin clones the repo, installs dependencies, sets up the dev environment — just like a human would <code>git clone && npm install</code>.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 04</div>
+      <h3>Code Generation</h3>
+      <p>The <strong>Coder</strong> model writes code file-by-file, following the approved plan. Replicates patterns from the existing codebase. The <strong>Browser Agent</strong> looks up docs for unfamiliar libraries in real time.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 05</div>
+      <h3>Test & Debug Loop</h3>
+      <p>Devin runs the code, executes tests, reads error outputs. If tests fail, it enters a debug loop — reading stack traces, modifying code, re-running. This loop can iterate dozens of times autonomously.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 06</div>
+      <h3>Adversarial Review</h3>
+      <p>The <strong>Critic</strong> model reviews the final code for security vulnerabilities, logic errors, and adherence to the plan. Generates a confidence score. Low confidence → asks the human for clarification.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 07</div>
+      <h3>PR Submission</h3>
+      <p>Devin creates a branch, commits the changes with meaningful messages, and opens a Pull Request on GitHub/GitLab. Includes descriptions, test results, and technical documentation.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">STEP 08</div>
+      <h3>Post-PR Feedback Loop</h3>
+      <p>Devin monitors CI status. If tests break, it auto-fixes. It also responds to reviewer comments on the PR — adjusting code based on human feedback without being re-prompted.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── COMPARISON ─── -->
+<section id="compare">
+  <h2>Devin vs Claude / Claude Code</h2>
+  <p class="section-lead">They solve different problems. Here's how they stack up across the dimensions that matter.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th class="highlight-devin">Devin (Cognition)</th>
+          <th class="highlight-claude">Claude Code (Anthropic)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Philosophy</td>
+          <td>Autonomous agent — assign and walk away</td>
+          <td>Agentic pair-programmer — stay in the loop</td>
+        </tr>
+        <tr>
+          <td>Execution Model</td>
+          <td>Cloud sandbox (Devbox), async</td>
+          <td>Local terminal, foreground & synchronous</td>
+        </tr>
+        <tr>
+          <td>Architecture</td>
+          <td>Compound AI: swarm of specialist models (Planner, Coder, Critic, Browser)</td>
+          <td>Single foundation model (Claude Opus/Sonnet) with tool use, sub-agents, hooks</td>
+        </tr>
+        <tr>
+          <td>Human Interaction</td>
+          <td>Low-touch: review plan → check PR later</td>
+          <td>High-touch: real-time dialogue, iterative</td>
+        </tr>
+        <tr>
+          <td>Codebase Understanding</td>
+          <td>Senior-level (auto-indexed Wiki, Search)</td>
+          <td>Very strong (200K+ context window, reads full repos)</td>
+        </tr>
+        <tr>
+          <td>Execution Quality</td>
+          <td>Junior-level (Cognition's own assessment); 67% PR merge rate</td>
+          <td>Strongest on hard problems; higher first-pass quality on complex tasks</td>
+        </tr>
+        <tr>
+          <td>Multi-Agent</td>
+          <td>Native parallel sessions; fleet of Devins</td>
+          <td>Sub-agent system & Agent Teams (Feb 2026)</td>
+        </tr>
+        <tr>
+          <td>IDE Integration</td>
+          <td>Own web IDE; Slack, VS Code extension</td>
+          <td>Terminal-native; works in any IDE via CLI</td>
+        </tr>
+        <tr>
+          <td>Deployment</td>
+          <td>Cloud-only (SaaS or customer VPC)</td>
+          <td>Runs locally; API-based</td>
+        </tr>
+        <tr>
+          <td>Best For</td>
+          <td>Batch tasks, migrations, vuln fixes, parallel throughput</td>
+          <td>Complex debugging, architecture, refactoring, interactive work</td>
+        </tr>
+        <tr>
+          <td>Pricing</td>
+          <td>$20/mo Core + $2.25/ACU (~15 min work)</td>
+          <td>Pay-per-token via API; ~$200/mo Max plan</td>
+        </tr>
+        <tr>
+          <td>SWE-bench</td>
+          <td>13.86% end-to-end (official)</td>
+          <td>Top scores &gt;72% (with scaffolding)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-title">Key Insight</div>
+    <p>Many teams use both. <strong>Devin for background, delegated tasks</strong> (bug triage, migrations, security fixes) and <strong>Claude Code for foreground, interactive work</strong> (debugging, architecture decisions, complex refactors). They are more complementary than competitive.</p>
+  </div>
+</section>
+
+<!-- ─── TRADE-OFFS ─── -->
+<section id="tradeoffs">
+  <h2>Trade-offs & Design Decisions</h2>
+
+  <div class="cards" style="grid-template-columns: 1fr 1fr;">
+    <div class="card">
+      <h3>🟢 Autonomy vs Control</h3>
+      <p><strong>Devin</strong> maximizes autonomy — great for throughput but you lose visibility into moment-by-moment decisions. <strong>Claude Code</strong> keeps you in the driver's seat — more control but requires your attention. The right choice depends on whether your bottleneck is engineer time or engineer throughput.</p>
+    </div>
+    <div class="card">
+      <h3>🟡 Multi-Model vs Single-Model</h3>
+      <p>Devin's compound architecture lets it specialize — the Critic catches what the Coder misses. But it adds latency, coordination overhead, and makes the system harder to debug when things go wrong. Claude's single-model approach is simpler, more predictable, and easier to reason about.</p>
+    </div>
+    <div class="card">
+      <h3>🔵 Cloud Sandbox vs Local</h3>
+      <p>Cloud execution means Devin can't mess up your local environment — great for safety. But it means network latency, no access to local tools/VPNs without explicit setup, and a dependency on Cognition's infrastructure. Claude Code runs where your code lives.</p>
+    </div>
+    <div class="card">
+      <h3>🟣 Async vs Sync Workflows</h3>
+      <p>Devin's fire-and-forget model scales to dozens of parallel tasks. Claude Code's synchronous model is better when the task needs iteration and judgment. The best teams create clear decision boundaries: "Is this a Devin task or a Claude task?"</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── GOTCHAS ─── -->
+<section id="gotchas">
+  <h2>Gotchas & Caveats</h2>
+
+  <div class="callout callout-danger">
+    <div class="callout-title">⚠️ Devin-Specific Gotchas</div>
+    <p><strong>Over-eagerness:</strong> Devin sometimes starts committing code and opening PRs before you've approved the approach. Set guardrails in your prompt: "Do not open a PR until I confirm."</p>
+    <p style="margin-top:0.7rem"><strong>Ambiguity is the enemy:</strong> Devin struggles with vague requirements. It needs specific component structures, color codes, spacing values. If outcomes aren't straightforwardly verifiable, human review is necessary.</p>
+    <p style="margin-top:0.7rem"><strong>SWE-bench reality check:</strong> The official 13.86% resolution rate means most complex, end-to-end tasks are not completed or only partially finished. Independent testing shows 15–30% success in practice.</p>
+    <p style="margin-top:0.7rem"><strong>Cost unpredictability:</strong> ACU-based billing ($2.25 per ~15 min) makes costs hard to forecast for complex tasks. A task that takes many debug loops can burn through ACUs quickly.</p>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ Claude Code Gotchas</div>
+    <p><strong>Rate limits as the product:</strong> Even at the $200/month Max plan, heavy users hit throttling. One developer noted: "The rate limits are the product. The model is just bait."</p>
+    <p style="margin-top:0.7rem"><strong>No free tier:</strong> Every competitor except Devin offers a free path. Claude Code has no free option.</p>
+    <p style="margin-top:0.7rem"><strong>Context window limits:</strong> Even with 200K+ tokens, very large codebases require careful chunking.</p>
+  </div>
+
+  <div class="callout callout-warn">
+    <div class="callout-title">⚠️ General Agent Gotchas</div>
+    <p><strong>Benchmark ≠ Production:</strong> Agent scaffolding matters as much as the model. Three frameworks running the same model scored 17 issues apart on 731 problems in the same test.</p>
+    <p style="margin-top:0.7rem"><strong>Security:</strong> Any agent with filesystem/CLI access introduces risk. Claude Code had reported RCE vulnerabilities in 2025. Devin's sandbox helps, but credentials leakage is still a human error risk.</p>
+    <p style="margin-top:0.7rem"><strong>The "junior-senior paradox":</strong> Devin is senior-level at codebase understanding but junior at execution. This mismatch means it can describe a perfect architecture but stumble implementing it.</p>
+  </div>
+</section>
+
+<!-- ─── WHEN TO USE ─── -->
+<section id="when">
+  <h2>When to Use What</h2>
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Use Devin When</div>
+    <p>You have a backlog of well-defined, repeatable tickets (bug fixes, security vuln patching, migrations like Angular → React or .NET Framework → .NET Core). When tasks have clear inputs/outputs and can be verified programmatically. When you want to parallelize — spin up a fleet of Devins to execute on every repo simultaneously. When the task would take a junior engineer 4–8 hours.</p>
+  </div>
+
+  <div class="callout callout-success">
+    <div class="callout-title">✅ Use Claude / Claude Code When</div>
+    <p>You need deep reasoning over a complex codebase. Architecture reviews, refactoring decisions where context matters more than speed. When you want interactive, iterative collaboration — "help me understand this problem" not "do this task." When working on novel, ambiguous problems that need human judgment at each step. When you want to stay local and IDE-native.</p>
+  </div>
+
+  <div class="callout callout-info">
+    <div class="callout-title">🔗 Combine Them</div>
+    <p>Use <strong>Claude</strong> to break down a complex feature into smaller, well-scoped tasks. Then assign each task to <strong>Devin</strong> for parallel execution. Connect both to your CI pipeline, linters, and static analysis. Keep human review as the final gate.</p>
+  </div>
+</section>
+
+</div><!-- container -->
+
+<div class="footer">
+  <div class="container">
+    Research compiled March 2026 · Sources: Cognition Labs docs, SWE-bench, independent reviews, Anthropic docs
+  </div>
+</div>
+
+</body>
+</html>
