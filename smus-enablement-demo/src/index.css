@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-aws-night text-slate-100 font-sans antialiased;
+  background-image: radial-gradient(
+      1200px 600px at 10% -10%,
+      rgba(107, 164, 255, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(900px 500px at 110% 10%, rgba(255, 153, 0, 0.06), transparent 60%);
+}
+
+/* Scrollbars */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+@layer components {
+  .card {
+    @apply rounded-xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+  }
+  .card-hover {
+    @apply transition hover:border-aws-accent/40 hover:bg-white/[0.05];
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-xs text-slate-300;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-aws-accent/60 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-aws-accent/90 text-aws-night hover:bg-aws-accent;
+  }
+  .btn-ghost {
+    @apply btn bg-white/5 text-slate-200 hover:bg-white/10;
+  }
+  .btn-orange {
+    @apply btn bg-aws-orange text-aws-night hover:brightness-110;
+  }
+  .kbd {
+    @apply rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-mono text-slate-300;
+  }
+  .section-title {
+    @apply text-2xl font-semibold tracking-tight text-white;
+  }
+  .section-sub {
+    @apply text-sm text-slate-400;
+  }
+  .nav-link {
+    @apply flex items-center gap-3 rounded-md px-3 py-2 text-sm text-slate-300 transition hover:bg-white/5 hover:text-white;
+  }
+  .nav-link-active {
+    @apply bg-aws-accent/15 text-white ring-1 ring-aws-accent/30;
+  }
+  .stat {
+    @apply rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-4;
+  }
+  .divider {
+    @apply h-px w-full bg-white/10;
+  }
+}
