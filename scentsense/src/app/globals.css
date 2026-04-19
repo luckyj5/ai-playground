@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+}
+
+html,
+body {
+  background-color: #F7F5F2;
+  color: #1A1612;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html.dark,
+html.dark body {
+  background-color: #0E0C0A;
+  color: #EDE8E1;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-ink-900 px-6 py-3 text-sm font-medium tracking-wide text-ink-50 transition hover:bg-ink-700 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-accent dark:text-ink-900 dark:hover:bg-accent-soft;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-full border border-ink-300/70 px-6 py-3 text-sm font-medium tracking-wide text-ink-800 transition hover:border-ink-900 hover:text-ink-900 dark:border-ink-600 dark:text-ink-100 dark:hover:border-accent dark:hover:text-accent;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium text-ink-700 transition hover:text-ink-900 dark:text-ink-200 dark:hover:text-accent;
+  }
+  .input-field {
+    @apply w-full rounded-full border border-ink-200 bg-white/80 px-5 py-3 text-sm text-ink-900 shadow-sm outline-none transition placeholder:text-ink-400 focus:border-ink-900 focus:shadow-ring dark:border-ink-700 dark:bg-ink-800 dark:text-ink-50 dark:placeholder:text-ink-400 dark:focus:border-accent;
+  }
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-ink-200 bg-white px-4 py-2 text-sm text-ink-800 transition hover:border-ink-900 hover:shadow-sm dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100 dark:hover:border-accent;
+  }
+  .chip-selected {
+    @apply border-ink-900 bg-ink-900 text-ink-50 shadow-sm dark:border-accent dark:bg-accent dark:text-ink-900;
+  }
+  .card {
+    @apply rounded-3xl border border-ink-100 bg-white/90 p-8 shadow-soft backdrop-blur-sm dark:border-ink-700 dark:bg-ink-800/90;
+  }
+  .card-muted {
+    @apply rounded-3xl border border-ink-100 bg-ink-50/70 p-8 dark:border-ink-700 dark:bg-ink-800/60;
+  }
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-[0.22em] text-accent-deep dark:text-accent;
+  }
+  .display {
+    @apply font-display font-light leading-[1.05] tracking-tight;
+  }
+}
+
+/* Subtle grain overlay for that luxury-catalogue feel */
+.grain {
+  background-image: radial-gradient(
+      circle at 25% 15%,
+      rgba(200, 169, 106, 0.08),
+      transparent 45%
+    ),
+    radial-gradient(circle at 85% 70%, rgba(200, 169, 106, 0.06), transparent 50%);
+}
