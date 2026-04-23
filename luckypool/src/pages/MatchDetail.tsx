@@ -85,8 +85,9 @@ export default function MatchDetail() {
           <PlayerBlock
             player={playerA}
             score={match.scoreA}
+            raceTo={target}
             pct={pctA}
-            winner={match.winnerId === playerA?.id}
+            winner={!!match.winnerId && match.winnerId === playerA?.id}
             onPlus={() => adjust('A', 1)}
             onMinus={() => adjust('A', -1)}
           />
@@ -105,8 +106,9 @@ export default function MatchDetail() {
             align="right"
             player={playerB}
             score={match.scoreB}
+            raceTo={target}
             pct={pctB}
-            winner={match.winnerId === playerB?.id}
+            winner={!!match.winnerId && match.winnerId === playerB?.id}
             onPlus={() => adjust('B', 1)}
             onMinus={() => adjust('B', -1)}
           />
@@ -137,6 +139,7 @@ export default function MatchDetail() {
 function PlayerBlock({
   player,
   score,
+  raceTo,
   pct,
   winner,
   align = 'left',
@@ -145,6 +148,7 @@ function PlayerBlock({
 }: {
   player?: ReturnType<typeof getPlayer>;
   score: number;
+  raceTo: number;
   pct: number;
   winner: boolean;
   align?: 'left' | 'right';
@@ -180,7 +184,9 @@ function PlayerBlock({
       </div>
       <div className="w-full max-w-xs">
         <div className="mb-1 flex items-center justify-between text-xs text-chalk/60">
-          <span>Progress to {score}</span>
+          <span>
+            {score} / {raceTo}
+          </span>
           <span>{Math.round(pct)}%</span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">

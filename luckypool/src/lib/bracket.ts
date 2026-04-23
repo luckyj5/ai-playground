@@ -132,18 +132,20 @@ export function generateSkeletonMatches(
   return out;
 }
 
-// Standard bracket seeding: 1,16,8,9,5,12,4,13,6,11,3,14,7,10,2,15 for N=16
+// Standard "reverse seed" bracket ordering.
+// size=2  -> [1, 2]
+// size=4  -> [1, 4, 2, 3]
+// size=8  -> [1, 8, 4, 5, 2, 7, 3, 6]
+// At every doubling, for each existing seed s, interleave (newSize + 1 - s).
 function seedOrder(size: number): number[] {
-  let rounds: number[][] = [[1, 2]];
-  while (rounds[0].length < size) {
-    const next: number[][] = [];
-    const len = rounds[0].length * 2;
-    for (const pair of rounds) {
-      const [a, b] = pair;
-      next.push([a, len + 1 - a]);
-      next.push([b, len + 1 - b]);
+  let order: number[] = [1, 2];
+  while (order.length < size) {
+    const newSize = order.length * 2;
+    const next: number[] = [];
+    for (const s of order) {
+      next.push(s, newSize + 1 - s);
     }
-    rounds = next;
+    order = next;
   }
-  return rounds.flat();
+  return order;
 }
