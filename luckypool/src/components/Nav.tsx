@@ -1,12 +1,14 @@
 import { NavLink, Link } from 'react-router-dom';
+import { EightBallLogo } from './PoolBall';
 
 const links = [
   { to: '/', label: 'Home', end: true },
   { to: '/tournaments', label: 'Tournaments' },
   { to: '/matches', label: 'Matches' },
   { to: '/players', label: 'Players' },
-  { to: '/venues', label: 'Venues' },
-  { to: '/builder', label: 'Tournament Builder' },
+  { to: '/leaderboard', label: 'Leaderboard' },
+  { to: '/play', label: 'Play' },
+  { to: '/builder', label: 'Builder' },
 ];
 
 export function Nav() {
@@ -70,9 +72,8 @@ export function Nav() {
 
 function LogoMark() {
   return (
-    <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-cue-accent text-ink shadow-cue">
-      <span className="absolute inset-1 rounded-full bg-chalk" />
-      <span className="relative font-display font-bold">8</span>
+    <span className="relative inline-flex h-9 w-9 items-center justify-center">
+      <EightBallLogo size={36} />
     </span>
   );
 }

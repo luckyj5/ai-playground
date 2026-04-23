@@ -10,6 +10,8 @@ import Players from './pages/Players';
 import PlayerDetail from './pages/PlayerDetail';
 import Venues from './pages/Venues';
 import TournamentBuilder from './pages/TournamentBuilder';
+import Leaderboard from './pages/Leaderboard';
+import Play from './pages/Play';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -27,6 +29,8 @@ function App() {
           <Route path="/players/:id" element={<PlayerDetail />} />
           <Route path="/venues" element={<Venues />} />
           <Route path="/builder" element={<TournamentBuilder />} />
+          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/play" element={<Play />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
