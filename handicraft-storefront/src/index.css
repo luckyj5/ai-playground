@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #FBF6EC;
+  color: #3B2A1A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Fraunces', 'Playfair Display', Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition;
+}
+
+.btn-primary {
+  @apply btn bg-terracotta-500 text-ivory hover:bg-terracotta-600 shadow-craft;
+}
+
+.btn-secondary {
+  @apply btn border border-terracotta-500 text-terracotta-500 hover:bg-terracotta-50;
+}
+
+.btn-ghost {
+  @apply btn text-bark/80 hover:bg-bark/5;
+}
+
+.card {
+  @apply rounded-2xl bg-white/90 border border-bark/10 shadow-craft;
+}
+
+.label {
+  @apply block text-xs font-semibold uppercase tracking-wide text-bark/60 mb-1;
+}
+
+.input {
+  @apply w-full rounded-lg border border-bark/15 bg-white px-3 py-2 text-sm text-bark focus:outline-none focus:ring-2 focus:ring-terracotta-300 focus:border-terracotta-400;
+}
+
+.chip {
+  @apply inline-flex items-center gap-1 rounded-full bg-saffron-50 text-saffron-700 text-xs font-medium px-2.5 py-1;
+}
