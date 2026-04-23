@@ -21,7 +21,7 @@ export default function Navbar() {
             ॐ
           </span>
           <span className="font-display text-xl font-semibold text-bark">
-            Kalakar <span className="text-terracotta-500">Bazaar</span>
+            Ananta <span className="text-terracotta-500">Crafts</span>
           </span>
         </Link>
 

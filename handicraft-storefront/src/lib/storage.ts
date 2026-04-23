@@ -28,8 +28,8 @@ export function clearKey(key: string): void {
 }
 
 export const STORAGE_KEYS = {
-  catalog: 'kb.catalog.v1',
-  cart: 'kb.cart.v1',
-  orders: 'kb.orders.v1',
-  user: 'kb.user.v1',
+  catalog: 'ac.catalog.v1',
+  cart: 'ac.cart.v1',
+  orders: 'ac.orders.v1',
+  user: 'ac.user.v1',
 } as const

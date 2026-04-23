@@ -19,7 +19,7 @@ export default function Home() {
               Launch your craft.
             </h1>
             <p className="mt-4 text-bark/75 text-lg max-w-md">
-              Kalakar Bazaar is a modern storefront for Indian heritage crafts —
+              Ananta Crafts is a modern storefront for Indian heritage crafts —
               block prints, Pattachitra, Dhokra, blue pottery. Upload a photo,
               we’ll draft the listing. You sell, we handle the story.
             </p>

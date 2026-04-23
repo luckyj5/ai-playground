@@ -25,7 +25,7 @@ function newOrderId(): string {
   const n = Math.floor(Math.random() * 1_000_000)
     .toString()
     .padStart(6, '0')
-  return `KB-${new Date().getFullYear()}-${n}`
+  return `AC-${new Date().getFullYear()}-${n}`
 }
 
 export function OrdersProvider({ children }: { children: ReactNode }) {

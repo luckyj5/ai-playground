@@ -114,7 +114,7 @@ where eligible, Amazon Pay UPI.
 
 ---
 
-## Where Kalakar Bazaar fits
+## Where Ananta Crafts fits
 
 Across the five, **none** offer a fast, self-service, image-led listing flow
 for artisans + a curated buyer experience with good storytelling. The

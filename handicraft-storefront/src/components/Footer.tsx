@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 md:grid-cols-4">
         <div>
           <div className="font-display text-lg font-semibold text-bark">
-            Kalakar Bazaar
+            Ananta Crafts
           </div>
           <p className="mt-2 text-sm text-bark/70 leading-relaxed">
             Handcrafted in India. Every piece carries the hand of its maker —
@@ -37,12 +37,12 @@ export default function Footer() {
             <li>Free shipping over ₹1,500</li>
             <li>7-day easy returns</li>
             <li>UPI · Cards · COD</li>
-            <li>hello@kalakarbazaar.in</li>
+            <li>hello@anantacrafts.in</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-bark/10 py-4 text-center text-xs text-bark/60">
-        © {new Date().getFullYear()} Kalakar Bazaar · Demo storefront · Part of the
+        © {new Date().getFullYear()} Ananta Crafts · Demo storefront · Part of the
         <a
           href="https://github.com/luckyj5/ai-playground"
           className="ml-1 underline hover:text-terracotta-600"

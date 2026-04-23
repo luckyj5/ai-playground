@@ -5,7 +5,7 @@ export default function Returns() {
     <div className="mx-auto max-w-3xl px-4 py-10 prose prose-stone">
       <h1 className="text-3xl font-semibold text-bark">Returns &amp; refunds</h1>
       <p className="text-bark/80 mt-2">
-        Every piece on Kalakar Bazaar is handmade. Small variations in colour,
+        Every piece on Ananta Crafts is handmade. Small variations in colour,
         weave, carve or brushstroke are the signature of the hand — not a
         defect. If something is genuinely damaged, wrong or not as described,
         we make it right.
@@ -27,7 +27,7 @@ export default function Returns() {
         </li>
         <li>
           <strong>Refund in 5–7 business days.</strong> Original payment method
-          for UPI / cards / netbanking; Kalakar credit for COD orders.
+          for UPI / cards / netbanking; Ananta credit for COD orders.
         </li>
       </ol>
 

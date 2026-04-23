@@ -1,4 +1,4 @@
-# Kalakar Bazaar — architecture &amp; production path
+# Ananta Crafts — architecture &amp; production path
 
 This demo is a single-page React app with everything stored in `localStorage`
 so it runs in the browser with zero backend. This doc sketches what to swap

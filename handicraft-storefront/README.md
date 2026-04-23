@@ -1,4 +1,4 @@
-# Kalakar Bazaar — handicraft storefront (demo)
+# Ananta Crafts — handicraft storefront (demo)
 
 A snap-and-list handicraft storefront celebrating India's artisan
 heritage — block prints, Pattachitra, Madhubani, Dhokra brass, Channapatna
