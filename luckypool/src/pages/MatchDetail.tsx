@@ -30,23 +30,24 @@ export default function MatchDetail() {
         if (m.id !== match.id) return m;
         const nextA = slot === 'A' ? Math.max(0, m.scoreA + delta) : m.scoreA;
         const nextB = slot === 'B' ? Math.max(0, m.scoreB + delta) : m.scoreB;
-        let status = m.status;
-        let winnerId = m.winnerId;
+        // A race-to format cannot end in a tie at raceTo, nor can the loser
+        // overtake the winner past raceTo. Reject any adjustment that would
+        // put both scores at or above raceTo.
+        if (nextA >= m.raceTo && nextB >= m.raceTo) return m;
+        let status: typeof m.status;
+        let winnerId: string | undefined;
         if (nextA >= m.raceTo && nextA > nextB) {
           status = 'completed';
           winnerId = m.playerAId;
         } else if (nextB >= m.raceTo && nextB > nextA) {
           status = 'completed';
           winnerId = m.playerBId;
-        } else if (status === 'completed' && nextA < m.raceTo && nextB < m.raceTo) {
-          // Only revert to live when an undo-decrement actually pulls the
-          // winning side back below raceTo. Without this guard, incrementing
-          // the loser to tie the winner (e.g. 11-11 in a race-to-11) would
-          // silently clear the winner.
+        } else if (nextA === 0 && nextB === 0) {
+          status = 'scheduled';
+          winnerId = undefined;
+        } else {
           status = 'live';
           winnerId = undefined;
-        } else if (status === 'scheduled' && (nextA > 0 || nextB > 0)) {
-          status = 'live';
         }
         return { ...m, scoreA: nextA, scoreB: nextB, status, winnerId };
       }),
