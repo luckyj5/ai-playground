@@ -30,9 +30,10 @@ export default function MatchDetail() {
         if (m.id !== match.id) return m;
         const nextA = slot === 'A' ? Math.max(0, m.scoreA + delta) : m.scoreA;
         const nextB = slot === 'B' ? Math.max(0, m.scoreB + delta) : m.scoreB;
-        // A race-to format cannot end in a tie at raceTo, nor can the loser
-        // overtake the winner past raceTo. Reject any adjustment that would
-        // put both scores at or above raceTo.
+        // In a race-to format, a player's score can never exceed the target.
+        if (nextA > m.raceTo || nextB > m.raceTo) return m;
+        // Both sides cannot sit at raceTo simultaneously (no ties; no loser
+        // overtaking the winner past the target).
         if (nextA >= m.raceTo && nextB >= m.raceTo) return m;
         let status: typeof m.status;
         let winnerId: string | undefined;
