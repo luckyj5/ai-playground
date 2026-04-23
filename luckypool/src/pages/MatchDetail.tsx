@@ -38,7 +38,11 @@ export default function MatchDetail() {
         } else if (nextB >= m.raceTo && nextB > nextA) {
           status = 'completed';
           winnerId = m.playerBId;
-        } else if (status === 'completed') {
+        } else if (status === 'completed' && nextA < m.raceTo && nextB < m.raceTo) {
+          // Only revert to live when an undo-decrement actually pulls the
+          // winning side back below raceTo. Without this guard, incrementing
+          // the loser to tie the winner (e.g. 11-11 in a race-to-11) would
+          // silently clear the winner.
           status = 'live';
           winnerId = undefined;
         } else if (status === 'scheduled' && (nextA > 0 || nextB > 0)) {
@@ -67,7 +71,7 @@ export default function MatchDetail() {
     <div className="mx-auto max-w-5xl px-4 py-10">
       <Link
         to={tournament ? `/tournaments/${tournament.id}` : '/matches'}
-        className="text-sm text-chalk/60 hover:text-chalk"
+        className="text-sm text-chalk-muted hover:text-chalk"
       >
         ← {tournament?.name ?? 'Back'}
       </Link>
@@ -91,7 +95,7 @@ export default function MatchDetail() {
             onPlus={() => adjust('A', 1)}
             onMinus={() => adjust('A', -1)}
           />
-          <div className="flex flex-col items-center text-chalk/40">
+          <div className="flex flex-col items-center text-chalk-muted">
             <span className="font-mono text-xs uppercase tracking-widest">
               vs
             </span>
@@ -115,7 +119,7 @@ export default function MatchDetail() {
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-xs text-chalk/50">
+          <div className="text-xs text-chalk-muted">
             Tablet-style scoring. Changes persist locally in your browser —
             refresh to come back to the same state. Hit <em>Reset</em> to
             replay.
@@ -126,7 +130,7 @@ export default function MatchDetail() {
         </div>
       </div>
 
-      <div className="mt-6 text-xs text-chalk/50">
+      <div className="mt-6 text-xs text-chalk-muted">
         Scheduled:{' '}
         {match.scheduledAt
           ? new Date(match.scheduledAt).toLocaleString()
@@ -176,20 +180,20 @@ function PlayerBlock({
           >
             {player?.name ?? 'TBD'}
           </div>
-          <div className="text-xs text-chalk/50">
+          <div className="text-xs text-chalk-muted">
             {player?.country}
             {player?.rating ? ` · Rating ${player.rating}` : ''}
           </div>
         </div>
       </div>
       <div className="w-full max-w-xs">
-        <div className="mb-1 flex items-center justify-between text-xs text-chalk/60">
+        <div className="mb-1 flex items-center justify-between text-xs text-chalk-muted">
           <span>
             {score} / {raceTo}
           </span>
           <span>{Math.round(pct)}%</span>
         </div>
-        <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-chalk/[0.08]">
           <div
             className="h-full rounded-full bg-cue-accent"
             style={{ width: `${pct}%` }}

@@ -37,7 +37,7 @@ export default function TournamentDetail() {
     <div className="mx-auto max-w-7xl px-4 py-10">
       {/* Hero */}
       <div
-        className="relative overflow-hidden rounded-3xl border border-white/10 p-8 md:p-12"
+        className="relative overflow-hidden rounded-3xl border border-chalk/10 p-8 md:p-12"
         style={{
           background: `linear-gradient(135deg, hsl(${tournament.bannerHue} 60% 25%) 0%, hsl(${
             (tournament.bannerHue + 40) % 360
@@ -103,7 +103,7 @@ export default function TournamentDetail() {
       <section className="mt-12">
         <h2 className="section-title mb-4">Matches</h2>
         {tMatches.length === 0 ? (
-          <div className="card p-8 text-center text-chalk/60">
+          <div className="card p-8 text-center text-chalk-muted">
             Matches will appear once the bracket is drawn.
           </div>
         ) : (
@@ -135,7 +135,7 @@ export default function TournamentDetail() {
                 <Avatar name={p.name} hue={p.avatarHue} />
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">{p.name}</div>
-                  <div className="text-xs text-chalk/50">
+                  <div className="text-xs text-chalk-muted">
                     {p.country} · Rating {p.rating}
                   </div>
                 </div>
@@ -158,12 +158,12 @@ function InfoStat({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-black/20 p-4 backdrop-blur">
-      <div className="text-[10px] uppercase tracking-widest text-chalk/50">
+    <div className="rounded-xl border border-chalk/10 bg-black/20 p-4 backdrop-blur">
+      <div className="text-[10px] uppercase tracking-widest text-chalk-muted">
         {label}
       </div>
       <div className="mt-1 font-display text-xl text-chalk">{value}</div>
-      {sub && <div className="text-xs text-chalk/50">{sub}</div>}
+      {sub && <div className="text-xs text-chalk-muted">{sub}</div>}
     </div>
   );
 }

@@ -49,7 +49,7 @@ export default function Tournaments() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <div className="flex flex-wrap items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1">
+        <div className="flex flex-wrap items-center gap-1 rounded-md border border-chalk/10 bg-chalk/[0.05] p-1">
           <FilterBtn
             active={discipline === 'all'}
             onClick={() => setDiscipline('all')}
@@ -66,7 +66,7 @@ export default function Tournaments() {
             </FilterBtn>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1">
+        <div className="flex flex-wrap items-center gap-1 rounded-md border border-chalk/10 bg-chalk/[0.05] p-1">
           <FilterBtn active={status === 'all'} onClick={() => setStatus('all')}>
             All status
           </FilterBtn>
@@ -87,7 +87,7 @@ export default function Tournaments() {
           <TournamentCard key={t.id} tournament={t} />
         ))}
         {filtered.length === 0 && (
-          <div className="col-span-full card p-10 text-center text-chalk/60">
+          <div className="col-span-full card p-10 text-center text-chalk-muted">
             No tournaments match those filters.
           </div>
         )}
@@ -111,7 +111,7 @@ function FilterBtn({
       className={`rounded px-2.5 py-1 text-xs transition-colors ${
         active
           ? 'bg-cue text-ink'
-          : 'text-chalk/70 hover:bg-white/5 hover:text-chalk'
+          : 'text-chalk/70 hover:bg-chalk/[0.05] hover:text-chalk'
       }`}
     >
       {children}

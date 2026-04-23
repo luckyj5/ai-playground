@@ -31,23 +31,30 @@ export default function Home() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-felt-gradient px-6 py-12 shadow-table md:px-12 md:py-20">
-        <div className="pointer-events-none absolute -top-24 -right-20 h-80 w-80 rounded-full bg-cue-accent/20 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-felt-300/20 blur-3xl" />
+      <section className="relative overflow-hidden rounded-3xl border border-cue-accent/20 bg-noir-gradient px-6 py-14 shadow-table md:px-14 md:py-24">
+        <div className="pointer-events-none absolute -top-24 -right-20 h-80 w-80 rounded-full bg-cue-accent/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-felt-500/15 blur-3xl" />
         <div className="relative max-w-3xl">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="section-eyebrow">The LuckyPool Tour</span>
+            <span className="h-px w-10 bg-cue-accent/50" />
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
             <DisciplineBadge discipline="8-ball" />
             <DisciplineBadge discipline="9-ball" />
             <DisciplineBadge discipline="snooker" />
           </div>
-          <h1 className="mt-4 font-display text-4xl leading-tight text-chalk md:text-6xl">
+          <h1 className="mt-6 font-display text-5xl leading-[1.05] text-chalk md:text-7xl">
             Bringing cue sports{' '}
-            <span className="text-cue-accent">online</span>.
+            <span className="bg-gold-gradient bg-clip-text text-transparent">
+              online
+            </span>
+            .
           </h1>
-          <p className="mt-4 max-w-xl text-lg text-chalk/80">
-            LuckyPool is the tournament platform for 8-ball, 9-ball and
-            snooker. Build brackets, live-score matches, track your stats
-            and connect with players and rooms around the world.
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-chalk-muted">
+            LuckyPool is the tournament platform for 8-ball, 9-ball and snooker.
+            Build brackets, live-score matches, track your stats and connect
+            with players and rooms around the world.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link to="/builder" className="btn-primary">

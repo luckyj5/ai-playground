@@ -4,6 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Base surface — a deep, warm near-black charcoal (no green tint).
+        ink: {
+          DEFAULT: '#0A0C12',
+          soft: '#0F1218',
+          raised: '#161A24',
+          elevated: '#1D2230',
+        },
+        // Pool-table felt — kept as an accent only (discipline chips, hero haze).
         felt: {
           50: '#EAF6EE',
           100: '#C9E6D1',
@@ -16,16 +24,20 @@ export default {
           800: '#082D17',
           900: '#041A0D',
         },
+        // Warm neutral ink for body copy — pushed lighter for readability.
         chalk: {
-          DEFAULT: '#F3F1EA',
-          muted: '#D9D5C8',
+          DEFAULT: '#F7F5EE',
+          muted: '#CBC6B9',
+          dim: '#8E8A7E',
         },
+        // Antique-gold signature — replaces the old copper.
         cue: {
-          DEFAULT: '#B87333',
-          accent: '#E4A94A',
+          DEFAULT: '#CBA24B',
+          accent: '#F0C75E',
+          deep: '#8F6C1E',
         },
+        // Leather rail / wooden trim — kept for the table shadow vibe.
         rail: '#2B1810',
-        ink: '#0B1410',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -33,14 +45,26 @@ export default {
         mono: ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        table: '0 20px 60px -20px rgba(0,0,0,0.6), inset 0 0 0 6px #2B1810',
-        cue: '0 0 0 1px rgba(228,169,74,0.3), 0 8px 24px -8px rgba(228,169,74,0.35)',
+        table:
+          '0 30px 80px -30px rgba(0,0,0,0.8), 0 0 0 1px rgba(240,199,94,0.12), inset 0 1px 0 rgba(255,255,255,0.04)',
+        cue: '0 0 0 1px rgba(240,199,94,0.35), 0 10px 30px -10px rgba(240,199,94,0.45)',
+        card:
+          '0 1px 0 rgba(255,255,255,0.04) inset, 0 20px 40px -24px rgba(0,0,0,0.8)',
+        'card-hover':
+          '0 1px 0 rgba(255,255,255,0.08) inset, 0 24px 48px -20px rgba(240,199,94,0.18)',
       },
       backgroundImage: {
+        // Premium noir-gold hero background — charcoal with a warm gold vignette.
+        'noir-gradient':
+          'radial-gradient(ellipse at 20% 0%, rgba(240,199,94,0.22) 0%, rgba(240,199,94,0) 55%), radial-gradient(ellipse at 90% 100%, rgba(31,127,63,0.22) 0%, rgba(31,127,63,0) 55%), linear-gradient(160deg, #10131C 0%, #0A0C12 55%, #06080C 100%)',
+        // Retained felt gradient for tournament banner stripes.
         'felt-gradient':
           'radial-gradient(ellipse at top, #1F7F3F 0%, #145F2F 40%, #082D17 100%)',
         'rail-gradient':
           'linear-gradient(180deg, #3B2015 0%, #2B1810 50%, #1A0E08 100%)',
+        // Gold leaf gradient for primary CTA / winner accents.
+        'gold-gradient':
+          'linear-gradient(135deg, #F0C75E 0%, #CBA24B 40%, #8F6C1E 100%)',
       },
       animation: {
         'fade-in': 'fadeIn .35s ease-out',

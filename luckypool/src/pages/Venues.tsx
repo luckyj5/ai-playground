@@ -15,15 +15,15 @@ export default function Venues() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="font-display text-xl">{v.name}</h3>
-                <div className="text-sm text-chalk/60">
+                <div className="text-sm text-chalk-muted">
                   {v.city}, {v.country}
                 </div>
               </div>
-              <div className="rounded-md border border-white/10 bg-white/5 px-2 py-1 text-center">
+              <div className="rounded-md border border-chalk/10 bg-chalk/[0.05] px-2 py-1 text-center">
                 <div className="font-mono text-lg text-cue-accent">
                   {v.tables}
                 </div>
-                <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+                <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
                   tables
                 </div>
               </div>

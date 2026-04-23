@@ -11,7 +11,7 @@ const links = [
 
 export function Nav() {
   return (
-    <header className="sticky top-0 z-30 border-b border-white/5 bg-ink/80 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-chalk/10 bg-ink/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
         <Link to="/" className="flex items-center gap-2">
           <LogoMark />
@@ -19,7 +19,7 @@ export function Nav() {
             <span className="font-display text-xl tracking-wide text-chalk">
               Lucky<span className="text-cue-accent">Pool</span>
             </span>
-            <span className="text-[10px] uppercase tracking-[0.2em] text-chalk/40">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-chalk-muted">
               Pool · Snooker · Tournaments
             </span>
           </div>
@@ -33,8 +33,8 @@ export function Nav() {
               className={({ isActive }) =>
                 `rounded-md px-3 py-1.5 text-sm transition-colors ${
                   isActive
-                    ? 'bg-white/10 text-chalk'
-                    : 'text-chalk/70 hover:bg-white/5 hover:text-chalk'
+                    ? 'bg-chalk/[0.08] text-chalk'
+                    : 'text-chalk/70 hover:bg-chalk/[0.05] hover:text-chalk'
                 }`
               }
             >
@@ -55,8 +55,8 @@ export function Nav() {
             className={({ isActive }) =>
               `rounded-md px-2.5 py-1 text-xs transition-colors ${
                 isActive
-                  ? 'bg-white/10 text-chalk'
-                  : 'text-chalk/70 hover:bg-white/5'
+                  ? 'bg-chalk/[0.08] text-chalk'
+                  : 'text-chalk/70 hover:bg-chalk/[0.05]'
               }`
             }
           >

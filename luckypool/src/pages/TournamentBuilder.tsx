@@ -171,7 +171,7 @@ export default function TournamentBuilder() {
                     className={`flex-1 rounded-md border px-3 py-2 text-sm transition-colors ${
                       draft.discipline === d
                         ? 'border-cue-accent bg-cue/20 text-chalk'
-                        : 'border-white/10 bg-white/5 text-chalk/70 hover:bg-white/10'
+                        : 'border-chalk/10 bg-chalk/[0.05] text-chalk/70 hover:bg-chalk/[0.08]'
                     }`}
                   >
                     <DisciplineBadge discipline={d} />
@@ -281,11 +281,11 @@ export default function TournamentBuilder() {
                 className={`rounded-lg border p-4 text-left transition-colors ${
                   draft.format === f.id
                     ? 'border-cue-accent bg-cue/10'
-                    : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
+                    : 'border-chalk/10 bg-ink-soft/60 hover:bg-chalk/[0.05]'
                 }`}
               >
                 <div className="font-medium text-chalk">{f.label}</div>
-                <div className="mt-1 text-xs text-chalk/60">{f.desc}</div>
+                <div className="mt-1 text-xs text-chalk-muted">{f.desc}</div>
               </button>
             ))}
           </div>
@@ -298,7 +298,7 @@ export default function TournamentBuilder() {
               value={playerFilter}
               onChange={(e) => setPlayerFilter(e.target.value)}
             />
-            <span className="text-xs text-chalk/60">
+            <span className="text-xs text-chalk-muted">
               {draft.playerIds.length} selected · suggest 2, 4, 8, 16, 32 for
               clean brackets
             </span>
@@ -314,13 +314,13 @@ export default function TournamentBuilder() {
                   className={`flex items-center gap-3 rounded-md border p-2 text-left transition-colors ${
                     selected
                       ? 'border-cue-accent bg-cue/10'
-                      : 'border-white/10 bg-white/[0.02] hover:bg-white/5'
+                      : 'border-chalk/10 bg-ink-soft/60 hover:bg-chalk/[0.05]'
                   }`}
                 >
                   <Avatar name={p.name} hue={p.avatarHue} size={32} />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm">{p.name}</div>
-                    <div className="text-[11px] text-chalk/50">
+                    <div className="text-[11px] text-chalk-muted">
                       {p.country} · {p.rating}
                     </div>
                   </div>
@@ -358,7 +358,7 @@ export default function TournamentBuilder() {
         {/* Preview */}
         <aside className="space-y-6">
           <div className="card p-6">
-            <div className="text-xs uppercase tracking-widest text-chalk/50">
+            <div className="text-xs uppercase tracking-widest text-chalk-muted">
               Live preview
             </div>
             <h3 className="mt-1 font-display text-2xl text-chalk">
@@ -377,7 +377,7 @@ export default function TournamentBuilder() {
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+                <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
                   Venue
                 </div>
                 <div>
@@ -385,7 +385,7 @@ export default function TournamentBuilder() {
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+                <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
                   Starts
                 </div>
                 <div>
@@ -395,13 +395,13 @@ export default function TournamentBuilder() {
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+                <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
                   Prize pool
                 </div>
                 <div>${draft.prizePool.toLocaleString()}</div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+                <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
                   Entry fee
                 </div>
                 <div>${draft.entryFee.toLocaleString()}</div>
@@ -410,7 +410,7 @@ export default function TournamentBuilder() {
           </div>
 
           <div className="card p-6">
-            <div className="mb-3 text-xs uppercase tracking-widest text-chalk/50">
+            <div className="mb-3 text-xs uppercase tracking-widest text-chalk-muted">
               Your tournaments
             </div>
             <ul className="space-y-2 text-sm">

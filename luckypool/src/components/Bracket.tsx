@@ -5,7 +5,7 @@ import { StatusPill } from './MatchCard';
 export function Bracket({ rounds }: { rounds: BracketRound[] }) {
   if (rounds.length === 0) {
     return (
-      <div className="card p-6 text-center text-chalk/60">
+      <div className="card p-6 text-center text-chalk-muted">
         Bracket will be generated once the draw is finalized.
       </div>
     );
@@ -18,7 +18,7 @@ export function Bracket({ rounds }: { rounds: BracketRound[] }) {
       >
         {rounds.map((r) => (
           <div key={r.round} className="flex w-[240px] flex-col">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-chalk/60">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-chalk-muted">
               {r.label}
             </div>
             <div className="flex flex-1 flex-col justify-around gap-4">
@@ -28,7 +28,7 @@ export function Bracket({ rounds }: { rounds: BracketRound[] }) {
                   className="card p-3 animate-fade-in"
                 >
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-[10px] uppercase tracking-wider text-chalk/40">
+                    <span className="text-[10px] uppercase tracking-wider text-chalk-muted">
                       Race to {n.raceTo}
                     </span>
                     <StatusPill status={n.status} />

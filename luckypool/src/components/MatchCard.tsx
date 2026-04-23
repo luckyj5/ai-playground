@@ -33,12 +33,12 @@ export function MatchCard({
         <PlayerLine player={playerA} winner={!!winnerA} />
         <div className="flex items-center gap-2 font-mono text-2xl text-chalk">
           <span className={winnerA ? 'text-cue-accent' : ''}>{match.scoreA}</span>
-          <span className="text-chalk/40">–</span>
+          <span className="text-chalk-muted">–</span>
           <span className={winnerB ? 'text-cue-accent' : ''}>{match.scoreB}</span>
         </div>
         <PlayerLine player={playerB} winner={!!winnerB} align="right" />
       </div>
-      <div className="mt-3 flex items-center justify-between text-xs text-chalk/50">
+      <div className="mt-3 flex items-center justify-between text-xs text-chalk-muted">
         <span>{tournamentName}</span>
         <span>
           {match.table ? `${match.table} · ` : ''}
@@ -66,7 +66,7 @@ function PlayerLine({
   const justify = align === 'right' ? 'justify-end text-right' : '';
   if (!player) {
     return (
-      <div className={`flex items-center gap-2 text-chalk/40 ${justify}`}>
+      <div className={`flex items-center gap-2 text-chalk-muted ${justify}`}>
         {align === 'right' ? null : <Avatar name="?" hue={0} size={32} />}
         <span className="text-sm italic">TBD</span>
         {align === 'right' ? <Avatar name="?" hue={0} size={32} /> : null}
@@ -86,7 +86,7 @@ function PlayerLine({
         >
           {player.name}
         </div>
-        <div className="text-xs text-chalk/50">{player.country}</div>
+        <div className="text-xs text-chalk-muted">{player.country}</div>
       </div>
       {align === 'right' ? (
         <Avatar name={player.name} hue={player.avatarHue} size={32} />
@@ -106,7 +106,7 @@ export function StatusPill({ status }: { status: Match['status'] }) {
   }
   if (status === 'completed') {
     return (
-      <span className="chip text-chalk/60">Final</span>
+      <span className="chip text-chalk-muted">Final</span>
     );
   }
   return <span className="chip">Scheduled</span>;

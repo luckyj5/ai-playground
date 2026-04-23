@@ -29,7 +29,7 @@ export function TournamentCard({ tournament }: { tournament: Tournament }) {
         <h3 className="mt-3 font-display text-lg leading-snug text-chalk group-hover:text-cue-accent">
           {tournament.name}
         </h3>
-        <div className="mt-1 text-xs text-chalk/50">
+        <div className="mt-1 text-xs text-chalk-muted">
           {venue?.name} · {venue?.city}
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-chalk/70">
@@ -40,7 +40,7 @@ export function TournamentCard({ tournament }: { tournament: Tournament }) {
             value={`$${tournament.prizePool.toLocaleString()}`}
           />
         </div>
-        <div className="mt-3 flex items-center justify-between text-xs text-chalk/50">
+        <div className="mt-3 flex items-center justify-between text-xs text-chalk-muted">
           <span>
             {start.toLocaleDateString(undefined, {
               month: 'short',
@@ -63,8 +63,8 @@ export function TournamentCard({ tournament }: { tournament: Tournament }) {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-white/5 bg-white/[0.02] px-2 py-1.5">
-      <div className="text-[10px] uppercase tracking-wider text-chalk/40">
+    <div className="rounded-md border border-chalk/10 bg-ink-soft/60 px-2 py-1.5">
+      <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
         {label}
       </div>
       <div className="text-sm text-chalk">{value}</div>
@@ -74,10 +74,10 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 export function StatusChip({ status }: { status: Tournament['status'] }) {
   const map: Record<Tournament['status'], string> = {
-    upcoming: 'border-white/15 bg-white/5 text-chalk/70',
+    upcoming: 'border-chalk/15 bg-chalk/[0.05] text-chalk/70',
     registering: 'border-emerald-400/30 bg-emerald-500/10 text-emerald-300',
     live: 'border-red-400/40 bg-red-500/10 text-red-300',
-    completed: 'border-white/10 bg-white/[0.03] text-chalk/50',
+    completed: 'border-chalk/10 bg-ink-soft/70 text-chalk-muted',
   };
   const label: Record<Tournament['status'], string> = {
     upcoming: 'Upcoming',

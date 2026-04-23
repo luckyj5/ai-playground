@@ -30,7 +30,7 @@ export default function PlayerDetail() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10">
-      <Link to="/players" className="text-sm text-chalk/60 hover:text-chalk">
+      <Link to="/players" className="text-sm text-chalk-muted hover:text-chalk">
         ← All players
       </Link>
 
@@ -38,7 +38,7 @@ export default function PlayerDetail() {
         <Avatar name={player.name} hue={player.avatarHue} size={120} />
         <div className="flex-1">
           <h1 className="font-display text-3xl md:text-4xl">{player.name}</h1>
-          <div className="mt-1 text-chalk/60">
+          <div className="mt-1 text-chalk-muted">
             @{player.handle} · {player.hometown}, {player.country}
           </div>
           <p className="mt-4 max-w-2xl text-chalk/80">{player.bio}</p>
@@ -58,7 +58,7 @@ export default function PlayerDetail() {
       <section className="mt-10">
         <h2 className="section-title mb-4">Matches</h2>
         {myMatches.length === 0 ? (
-          <div className="card p-8 text-center text-chalk/60">
+          <div className="card p-8 text-center text-chalk-muted">
             No matches on record yet.
           </div>
         ) : (
@@ -81,8 +81,8 @@ export default function PlayerDetail() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-white/10 bg-black/20 p-3 text-center">
-      <div className="text-[10px] uppercase tracking-wider text-chalk/50">
+    <div className="rounded-lg border border-chalk/10 bg-black/20 p-3 text-center">
+      <div className="text-[10px] uppercase tracking-wider text-chalk-muted">
         {label}
       </div>
       <div className="font-display text-2xl text-cue-accent">{value}</div>

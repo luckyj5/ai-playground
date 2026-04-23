@@ -44,13 +44,13 @@ export default function Players() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
-        <div className="flex flex-wrap items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1">
+        <div className="flex flex-wrap items-center gap-1 rounded-md border border-chalk/10 bg-chalk/[0.05] p-1">
           <button
             onClick={() => setDiscipline('all')}
             className={`rounded px-2.5 py-1 text-xs ${
               discipline === 'all'
                 ? 'bg-cue text-ink'
-                : 'text-chalk/70 hover:bg-white/5'
+                : 'text-chalk/70 hover:bg-chalk/[0.05]'
             }`}
           >
             All
@@ -62,7 +62,7 @@ export default function Players() {
               className={`rounded px-2.5 py-1 text-xs ${
                 discipline === d
                   ? 'bg-cue text-ink'
-                  : 'text-chalk/70 hover:bg-white/5'
+                  : 'text-chalk/70 hover:bg-chalk/[0.05]'
               }`}
             >
               {d === '8-ball' ? '8-Ball' : d === '9-ball' ? '9-Ball' : 'Snooker'}
@@ -83,7 +83,7 @@ export default function Players() {
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <div className="truncate font-medium">{p.name}</div>
-                  <div className="text-xs text-chalk/50">
+                  <div className="text-xs text-chalk-muted">
                     @{p.handle} · {p.country}
                   </div>
                 </div>

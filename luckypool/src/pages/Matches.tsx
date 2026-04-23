@@ -36,7 +36,7 @@ export default function Matches() {
         Every match streamed to the platform, across every tournament.
       </p>
 
-      <div className="mt-6 inline-flex items-center gap-1 rounded-md border border-white/10 bg-white/5 p-1">
+      <div className="mt-6 inline-flex items-center gap-1 rounded-md border border-chalk/10 bg-chalk/[0.05] p-1">
         {(['all', 'live', 'scheduled', 'completed'] as StatusFilter[]).map(
           (s) => (
             <button
@@ -45,7 +45,7 @@ export default function Matches() {
               className={`rounded px-3 py-1 text-xs capitalize transition-colors ${
                 status === s
                   ? 'bg-cue text-ink'
-                  : 'text-chalk/70 hover:bg-white/5 hover:text-chalk'
+                  : 'text-chalk/70 hover:bg-chalk/[0.05] hover:text-chalk'
               }`}
             >
               {s}
@@ -65,7 +65,7 @@ export default function Matches() {
           />
         ))}
         {list.length === 0 && (
-          <div className="col-span-full card p-10 text-center text-chalk/60">
+          <div className="col-span-full card p-10 text-center text-chalk-muted">
             No matches match those filters.
           </div>
         )}
