@@ -13,6 +13,12 @@ export async function POST(req: Request) {
       { status: 400 },
     );
   }
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json(
+      { ok: false, error: "Invalid request body" },
+      { status: 400 },
+    );
+  }
   const b = body as { email?: unknown; source?: unknown };
   if (!isValidEmail(String(b.email ?? ""))) {
     return NextResponse.json(
