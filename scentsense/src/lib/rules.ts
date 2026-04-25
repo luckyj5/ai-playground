@@ -32,8 +32,8 @@ export function rankFragrances(
       score += 1;
     }
 
-    if (input.gender === "any" || f.gender === "unisex") score += 1;
-    else if (f.gender === input.gender) score += 2;
+    if (f.gender === input.gender) score += 2;
+    else if (input.gender === "any" || f.gender === "unisex") score += 1;
     else score -= 2;
 
     // Gentle penalty for mismatched weather extremes
