@@ -80,7 +80,7 @@ export const PAYMENT_LABEL: Record<PaymentMethod, string> = {
 
 export const PAYMENT_HINT: Record<PaymentMethod, string> = {
   UPI: 'Instant · zero fees · recommended for Indian shoppers',
-  Card: 'Visa · Mastercard · RuPay · Amex · 3-D Secure',
+  Card: 'Visa · Mastercard · Amex · RuPay (IN) · 3-D Secure',
   Netbanking: 'All major Indian banks supported',
   COD: '₹29 handling · pay when it arrives',
   PayPal: 'Buyer-protected · pay with your PayPal balance or linked card',
