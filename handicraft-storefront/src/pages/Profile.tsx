@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../store/AuthContext'
 import { useOrders } from '../store/OrdersContext'
 import type { Address } from '../types'
+import { COUNTRIES, getCountry, type CountryCode } from '../lib/regions'
 
 const EMPTY_ADDRESS: Address = {
   name: '',
@@ -12,6 +13,7 @@ const EMPTY_ADDRESS: Address = {
   city: '',
   state: '',
   pincode: '',
+  countryCode: 'IN',
   country: 'India',
 }
 
@@ -142,7 +144,9 @@ export default function Profile() {
                     <div>
                       {a.city}, {a.state} {a.pincode}
                     </div>
-                    <div className="text-bark/60">{a.phone}</div>
+                    <div className="text-bark/60">
+                      {a.country ?? 'India'} · {a.phone}
+                    </div>
                   </div>
                   <button
                     className="text-xs text-bark/50 hover:text-terracotta-600"
@@ -196,10 +200,25 @@ export default function Profile() {
               />
               <input
                 className="input"
-                placeholder="PIN code"
+                placeholder="PIN / ZIP code"
                 value={addr.pincode}
                 onChange={(e) => setAddr({ ...addr, pincode: e.target.value })}
               />
+              <select
+                className="input col-span-2"
+                value={addr.countryCode}
+                onChange={(e) => {
+                  const code = e.target.value as CountryCode
+                  const c = getCountry(code)
+                  setAddr({ ...addr, countryCode: code, country: c.name })
+                }}
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
             </div>
             <button
               className="btn-secondary mt-3"

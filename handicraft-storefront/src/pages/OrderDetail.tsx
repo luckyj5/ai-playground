@@ -2,6 +2,8 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { useState } from 'react'
 import { useOrders } from '../store/OrdersContext'
 import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import type { Currency } from '../lib/regions'
 import type { OrderStatus } from '../types'
 
 const STATUS_STEPS: OrderStatus[] = ['placed', 'packed', 'shipped', 'delivered']
@@ -25,6 +27,9 @@ export default function OrderDetail() {
   const [showReturn, setShowReturn] = useState(false)
 
   const order = id ? getById(id) : undefined
+  // Older orders saved before multi-currency support default to INR.
+  const currency: Currency = order?.currency ?? 'INR'
+  const fmt = (m: number) => formatMoney(m, currency)
   if (!order) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-center">
@@ -129,24 +134,38 @@ export default function OrderDetail() {
                 <div className="text-xs text-bark/60">Qty {l.qty}</div>
               </div>
               <div className="font-medium text-bark">
-                {formatINR(l.unitPriceMinor * l.qty)}
+                {fmt(l.unitPriceMinor * l.qty)}
               </div>
             </div>
           ))}
         </div>
         <div className="border-t border-bark/10 mt-4 pt-3 text-sm space-y-1">
-          <Row label="Subtotal" value={formatINR(order.subtotalMinor)} />
+          <Row label="Subtotal" value={fmt(order.subtotalMinor)} />
           <Row
             label={order.shippingMinor === 0 ? 'Shipping (free)' : 'Shipping'}
             value={
-              order.shippingMinor === 0 ? '—' : formatINR(order.shippingMinor)
+              order.shippingMinor === 0 ? '—' : fmt(order.shippingMinor)
             }
           />
-          <Row label="GST" value={formatINR(order.taxMinor)} />
+          <Row
+            label={order.address.country === 'India' ? 'GST' : 'Duties & taxes'}
+            value={
+              order.taxMinor === 0
+                ? order.address.country === 'India'
+                  ? '—'
+                  : 'On delivery'
+                : fmt(order.taxMinor)
+            }
+          />
           <div className="flex justify-between font-semibold text-bark pt-1">
             <span>Total</span>
-            <span>{formatINR(order.totalMinor)}</span>
+            <span>{fmt(order.totalMinor)}</span>
           </div>
+          {currency !== 'INR' && (
+            <div className="text-[11px] text-bark/50">
+              ≈ {formatINR(order.totalMinor)} at checkout
+            </div>
+          )}
           <div className="text-xs text-bark/60 pt-1">
             Paid via {order.payment}
           </div>

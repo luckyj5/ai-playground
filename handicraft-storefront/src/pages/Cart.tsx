@@ -99,6 +99,11 @@ export default function Cart() {
             <span>Total</span>
             <span>{formatINR(totalMinor)}</span>
           </div>
+          <p className="text-[11px] text-bark/50 pt-2">
+            Shipping outside India? Pick your country at checkout — we’ll
+            recompute shipping, taxes and switch to your local currency
+            (USD, GBP, EUR, AUD, CAD, AED, SGD, JPY).
+          </p>
         </div>
         <Link to="/checkout" className="btn-primary w-full mt-5">
           Checkout

@@ -99,9 +99,15 @@ export default function ProductDetail() {
           </div>
 
           <ul className="mt-6 text-sm text-bark/70 space-y-1">
-            <li>✓ Free shipping over ₹1,500 · 3–7 business days</li>
+            <li>
+              ✓ Free shipping over ₹1,500 in India · ₹2,499 flat international
+              (free over ₹10,000) · 3–7 days domestic, 5–10 days global
+            </li>
             <li>✓ 7-day easy returns (pickup included)</li>
-            <li>✓ Pay via UPI, cards, netbanking or Cash on Delivery</li>
+            <li>
+              ✓ Pay via UPI, cards, netbanking or COD in India · cards,
+              PayPal, Apple Pay, Google Pay or bank transfer worldwide
+            </li>
           </ul>
         </div>
       </div>

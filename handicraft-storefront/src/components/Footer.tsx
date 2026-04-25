@@ -36,7 +36,8 @@ export default function Footer() {
           <ul className="space-y-1 text-sm text-bark/70">
             <li>Free shipping over ₹1,500</li>
             <li>7-day easy returns</li>
-            <li>UPI · Cards · COD</li>
+            <li>UPI · Cards · PayPal · Apple/Google Pay · COD</li>
+            <li>Worldwide shipping</li>
             <li>hello@anantacrafts.in</li>
           </ul>
         </div>

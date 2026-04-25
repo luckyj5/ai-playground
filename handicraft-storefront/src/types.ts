@@ -60,11 +60,25 @@ export type Address = {
   line2?: string
   city: string
   state: string
+  /** Postal / ZIP code. Format depends on country. */
   pincode: string
-  country: 'India'
+  /** ISO-style country code we recognise; see lib/regions.ts. */
+  countryCode: import('./lib/regions').CountryCode
+  /** Human-readable country name for display & invoicing. */
+  country: string
 }
 
-export type PaymentMethod = 'UPI' | 'Card' | 'Netbanking' | 'COD'
+export type PaymentMethod =
+  // India rail (Razorpay)
+  | 'UPI'
+  | 'Card'
+  | 'Netbanking'
+  | 'COD'
+  // Global rail (Stripe / PayPal)
+  | 'PayPal'
+  | 'ApplePay'
+  | 'GooglePay'
+  | 'BankTransfer'
 
 export type OrderStatus =
   | 'placed'
@@ -88,10 +102,14 @@ export type Order = {
   id: string
   createdAt: number
   lines: OrderLine[]
+  /** All amounts are stored canonically in INR minor units. */
   subtotalMinor: number
   shippingMinor: number
   taxMinor: number
   totalMinor: number
+  /** Display currency captured at checkout (so the order page renders in
+   *  the same currency the buyer paid in, even if FX rates drift). */
+  currency: import('./lib/regions').Currency
   address: Address
   payment: PaymentMethod
   status: OrderStatus

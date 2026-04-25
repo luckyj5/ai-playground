@@ -34,7 +34,7 @@ export default function Home() {
             <div className="mt-6 text-sm text-bark/60 flex flex-wrap gap-x-6 gap-y-1">
               <span>✓ Free shipping over ₹1,500</span>
               <span>✓ 7-day easy returns</span>
-              <span>✓ UPI · Cards · COD</span>
+              <span>✓ UPI · Cards · PayPal · Apple/Google Pay · COD</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -86,7 +86,7 @@ export default function Home() {
           },
           {
             title: 'Trusted commerce',
-            body: 'Cart, checkout, UPI / card / COD, GST on invoice, 7-day returns with pickup — the basics, done well.',
+            body: 'Cart, checkout, UPI · cards · PayPal · Apple/Google Pay · COD, GST on invoice, 7-day returns with pickup — worldwide shipping, the basics done well.',
             emoji: '🧾',
           },
         ].map((c) => (

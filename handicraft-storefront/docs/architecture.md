@@ -37,10 +37,11 @@ in when moving from demo to production.
 | Auth | local session | Auth.js (email OTP, Google, Apple) or WhatsApp OTP via MSG91 |
 | Image storage | data URLs | S3 / Cloudflare R2 + image resize via Cloudflare Images or Imgix |
 | Vision listing | deterministic stub | OpenAI `gpt-4o` or Google `gemini-2.0-flash` with the photo + a JSON schema |
-| Payments | simulated | **Razorpay** primary, Stripe fallback for cross-border |
-| Shipping | flat ₹99 free>₹1500 | Shiprocket / Delhivery API for live rates + AWB |
-| Tax | flat 5% GST | Compute per-SKU HSN from Clear / IndiaGST |
-| Returns | status machine | Pickup via Shiprocket Reverse, refund via Razorpay Refunds API |
+| Payments | simulated | **Dual rail**: Razorpay (India — UPI/Card/Netbanking/COD) + **Stripe** & **PayPal** (global — Card/Apple Pay/Google Pay/PayPal/SEPA/ACH) |
+| Shipping | flat ₹99 free>₹1500 (IN) · ₹2,499 free>₹10,000 (intl) | Shiprocket / Delhivery for India · DHL Express / FedEx International for global · EasyPost or Shippo for unified API |
+| Tax | India: 5% GST · Intl: collected on delivery | India: HSN-driven GST via Clear/IndiaGST · Intl: TaxJar / Avalara for VAT/GST destination calc; DDP for high-value via DHL Paperless Trade |
+| FX & currency | indicative INR→foreign rates | Stripe FX (lock at PaymentIntent) or Wise Platform; show local currency on PDP via geo-IP |
+| Returns | status machine | India: Shiprocket Reverse pickup + Razorpay refund · Intl: store credit by default; physical return via DHL Reverse for high-value; Stripe / PayPal refund |
 | Transactional messaging | — | MSG91 (WhatsApp + SMS) + Resend (email) |
 | Analytics | — | PostHog (product) + GA4 (marketing) |
 | Error / perf | — | Sentry + Vercel Speed Insights |
@@ -90,27 +91,83 @@ export async function POST(req: Request) {
 The client only needs to change the call site — the `ListingSuggestion` type
 is the contract.
 
-## Payments — Razorpay integration outline
+## Payments — dual-rail (India + global)
 
-1. Create a Razorpay account, get `key_id` / `key_secret`, enable UPI, cards
-   and netbanking.
-2. Server: expose `POST /api/payments/create-order` — call
-   `razorpay.orders.create({ amount, currency: 'INR' })` and return the
-   order ID.
-3. Client: open Razorpay Checkout with that order ID; on success, call
-   `POST /api/payments/verify` which verifies the HMAC signature server-side
-   and flips the order status from `pending_payment` to `placed`.
-4. Webhook: subscribe to `payment.captured` and `payment.failed` for
-   reconciliation.
-5. Refunds: `POST /api/payments/refund` calls `razorpay.payments.refund()`;
-   plug into the return-completed event.
+The checkout picks a payment processor based on the buyer's country (see
+`src/lib/regions.ts` — `regionFor(countryCode)`):
 
-## Shipping &amp; returns — Shiprocket outline
+```
+         country == 'IN'                   country != 'IN'
+              │                                  │
+         ┌────┴────┐                         ┌────┴─────┐
+         │ Razorpay│                         │ Stripe / │
+         │  rail   │                         │ PayPal   │
+         └───┬────┘                         └────┬────┘
+             │                                   │
+  UPI · Card · Netbanking · COD          Card · Apple Pay · Google Pay
+                                          PayPal · Bank transfer
+                                          (SEPA / ACH / SWIFT)
+```
 
+### India rail — Razorpay
+
+1. Get `key_id` / `key_secret`, enable UPI, cards, netbanking, COD.
+2. Server: `POST /api/payments/in/create-order` →
+   `razorpay.orders.create({ amount, currency: 'INR' })`.
+3. Client: open Razorpay Checkout; on success call
+   `POST /api/payments/in/verify` which HMAC-verifies the signature server-side.
+4. Subscribe to `payment.captured` / `payment.failed` webhooks for reconciliation.
+5. Refunds: `razorpay.payments.refund()` on return-completed.
+
+### Global rail — Stripe (default) + PayPal
+
+1. Stripe: get `STRIPE_SECRET_KEY`, enable Cards + Apple Pay + Google Pay
+   + Klarna + SEPA + ACH in the dashboard.
+2. Server: `POST /api/payments/intl/create-payment-intent` calls
+   `stripe.paymentIntents.create({ amount, currency, automatic_payment_methods: { enabled: true } })`
+   where `amount` is FX-converted from INR using `stripe.exchangeRates` and
+   locked for the next 10 minutes. Return `client_secret`.
+3. Client: render Stripe Elements / Payment Element; `stripe.confirmPayment`
+   handles 3-D Secure / Apple Pay / Google Pay automatically.
+4. PayPal: parallel "PayPal" button via PayPal JS SDK; server creates the
+   PayPal order with `purchase_units[0].amount = { currency_code, value }`.
+5. Webhooks: `payment_intent.succeeded` / `payment_intent.payment_failed`
+   from Stripe; `CHECKOUT.ORDER.APPROVED` from PayPal.
+6. Refunds: `stripe.refunds.create()` or `paypal.payments.refund()`.
+7. Cross-border compliance: enable Stripe Tax for VAT/GST collection (EU,
+   UK, AU, CA), DDP via DHL Paperless Trade for items > $200, store the
+   commercial invoice with the order.
+
+### Currency & FX
+
+- Canonical price is INR minor units in the DB.
+- On checkout the server creates a `PaymentIntent` (or PayPal order) in the
+  buyer's local currency at the locked FX rate, and stores both:
+  `paid_currency`, `paid_amount_minor`, `fx_rate`, `inr_amount_minor`.
+- Refunds reverse in the same `paid_currency`.
+- The `currency` field on `Order` in this demo is the placeholder for
+  `paid_currency`.
+
+## Shipping &amp; returns
+
+### India
 - On `placed → packed`, call Shiprocket `orders/create` to generate an AWB.
 - Webhook `shipment/awb-generated` updates tracking on the order page.
 - On `return_requested`, call `orders/create-reverse` for pickup.
 - On pickup-delivered + QC pass, trigger Razorpay refund.
+
+### Global
+- DHL Express MyDHL API or FedEx Web Services for AWB generation +
+  customs paperwork. EasyPost / Shippo offer a unified abstraction if
+  you want to pick rates across DHL/FedEx/UPS at runtime.
+- HS codes: pre-tag every product with an HS code (handicrafts often map
+  to chapter 57–71; e.g. textile stoles → 6214). Stripe Tax / Avalara can
+  compute destination tax from HS + ship-to country.
+- DDU vs DDP: by default duties are collected by the carrier on delivery
+  (DDU). For high-value or US-bound orders consider DDP via DHL
+  Paperless Trade so duties are pre-paid at checkout.
+- Returns from outside India are rare and expensive — default policy is
+  store credit; only physical pickup if item value > $250.
 
 ## Data model (Postgres)
 
@@ -137,7 +194,9 @@ returns (id, order_id, reason, state, refund_amount_minor, created_at)
 
 1. **Week 1–2.** Stand up backend + Postgres; migrate contexts to API calls
    behind the same hook names (zero UI churn).
-2. **Week 2–3.** Wire Razorpay + Shiprocket + MSG91.
+2. **Week 2–3.** Wire Razorpay + Shiprocket + MSG91 for India.
+2a. **Week 2–4 (parallel).** Wire Stripe (Cards + Apple Pay + Google Pay)
+    + PayPal + DHL Express for international; turn on Stripe Tax for VAT/GST.
 3. **Week 3–4.** Ship real vision-LLM drafting; add moderation queue for
    new listings (human-in-the-loop for first 30 days).
 4. **Week 4–6.** SEO overhaul — migrate to Next.js, add per-tradition

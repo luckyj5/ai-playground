@@ -5,6 +5,19 @@ import { useCatalog } from '../store/CatalogContext'
 import { useOrders } from '../store/OrdersContext'
 import { useAuth } from '../store/AuthContext'
 import { formatINR } from '../lib/currency'
+import {
+  COUNTRIES,
+  PAYMENT_HINT,
+  PAYMENT_LABEL,
+  PAYMENT_METHODS_BY_REGION,
+  formatMoney,
+  getCountry,
+  isIndia,
+  regionFor,
+  shippingMinorFor,
+  taxFor,
+  type CountryCode,
+} from '../lib/regions'
 import type { Address, OrderLine, PaymentMethod } from '../types'
 
 const EMPTY_ADDRESS: Address = {
@@ -15,36 +28,57 @@ const EMPTY_ADDRESS: Address = {
   city: '',
   state: '',
   pincode: '',
+  countryCode: 'IN',
   country: 'India',
 }
 
 export default function Checkout() {
-  const { lines, subtotalMinor, shippingMinor, taxMinor, totalMinor, clear } =
-    useCart()
+  const { lines, subtotalMinor, clear } = useCart()
   const { getById } = useCatalog()
   const { placeOrder } = useOrders()
   const { user, addAddress } = useAuth()
   const navigate = useNavigate()
 
-  const defaultAddr = user?.addresses[0] ?? EMPTY_ADDRESS
-  const [address, setAddress] = useState<Address>({
-    ...defaultAddr,
-    name: defaultAddr.name || user?.name || '',
-  })
-  const [payment, setPayment] = useState<PaymentMethod>('UPI')
+  const seedAddr = user?.addresses[0]
+  const [address, setAddress] = useState<Address>(() =>
+    seedAddr
+      ? {
+          ...EMPTY_ADDRESS,
+          ...seedAddr,
+          countryCode: seedAddr.countryCode ?? 'IN',
+          country: seedAddr.country ?? 'India',
+          name: seedAddr.name || user?.name || '',
+        }
+      : { ...EMPTY_ADDRESS, name: user?.name ?? '' },
+  )
+
+  const country = getCountry(address.countryCode)
+  const region = regionFor(address.countryCode)
+  const allowedPayments = PAYMENT_METHODS_BY_REGION[region]
+  const [payment, setPayment] = useState<PaymentMethod>(allowedPayments[0])
   const [saveAddr, setSaveAddr] = useState(true)
   const [placing, setPlacing] = useState(false)
 
-  const isValid = useMemo(
-    () =>
-      address.name.trim() &&
-      address.phone.trim().length >= 10 &&
-      address.line1.trim() &&
-      address.city.trim() &&
-      address.state.trim() &&
-      /^\d{6}$/.test(address.pincode.trim()),
-    [address],
-  )
+  // Re-derive totals based on shipping country.
+  const shippingMinor = shippingMinorFor(address.countryCode, subtotalMinor)
+  const tax = taxFor(address.countryCode, subtotalMinor)
+  const totalMinor = subtotalMinor + shippingMinor + tax.minor
+
+  const isValid = useMemo(() => {
+    if (
+      !address.name.trim() ||
+      address.phone.trim().length < 7 ||
+      !address.line1.trim() ||
+      !address.city.trim() ||
+      !address.pincode.trim()
+    )
+      return false
+    // India enforces a strict 6-digit PIN and a state.
+    if (isIndia(address.countryCode)) {
+      return !!address.state.trim() && /^\d{6}$/.test(address.pincode.trim())
+    }
+    return true
+  }, [address])
 
   if (lines.length === 0) {
     return (
@@ -54,11 +88,21 @@ export default function Checkout() {
     )
   }
 
+  function onCountryChange(code: CountryCode) {
+    const c = getCountry(code)
+    setAddress((a) => ({ ...a, countryCode: code, country: c.name }))
+    const nextRegion = regionFor(code)
+    const nextAllowed = PAYMENT_METHODS_BY_REGION[nextRegion]
+    if (!nextAllowed.includes(payment)) {
+      setPayment(nextAllowed[0])
+    }
+  }
+
   async function handlePlace() {
     if (!isValid || placing) return
     setPlacing(true)
 
-    // Simulate payment processing (UPI/card/netbanking auth).
+    // Simulate payment processing (UPI/card/PayPal/Apple-Pay/etc.).
     await new Promise((r) => setTimeout(r, payment === 'COD' ? 400 : 1100))
 
     const orderLines: OrderLine[] = lines.flatMap((l) => {
@@ -79,8 +123,9 @@ export default function Checkout() {
       lines: orderLines,
       subtotalMinor,
       shippingMinor,
-      taxMinor,
+      taxMinor: tax.minor,
       totalMinor,
+      currency: country.currency,
       address,
       payment,
     })
@@ -109,6 +154,20 @@ export default function Checkout() {
             Delivery address
           </h2>
           <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="col-span-2">
+              <label className="label">Country / region</label>
+              <select
+                className="input"
+                value={address.countryCode}
+                onChange={(e) => onCountryChange(e.target.value as CountryCode)}
+              >
+                {COUNTRIES.map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.name} · pay in {c.currency}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Field
               label="Full name"
               value={address.name}
@@ -118,7 +177,9 @@ export default function Checkout() {
               label="Phone"
               value={address.phone}
               onChange={(v) => setAddress({ ...address, phone: v })}
-              placeholder="10-digit mobile"
+              placeholder={
+                isIndia(address.countryCode) ? '10-digit mobile' : 'Incl. country code'
+              }
             />
             <Field
               label="Address line 1"
@@ -138,17 +199,17 @@ export default function Checkout() {
               onChange={(v) => setAddress({ ...address, city: v })}
             />
             <Field
-              label="State"
+              label={isIndia(address.countryCode) ? 'State' : 'State / Province'}
               value={address.state}
               onChange={(v) => setAddress({ ...address, state: v })}
             />
             <Field
-              label="PIN code"
+              label={isIndia(address.countryCode) ? 'PIN code' : 'Postal / ZIP'}
               value={address.pincode}
               onChange={(v) => setAddress({ ...address, pincode: v })}
-              placeholder="6 digits"
+              placeholder={isIndia(address.countryCode) ? '6 digits' : 'e.g. 94110'}
             />
-            <Field label="Country" value="India" onChange={() => {}} disabled />
+            <Field label="Country" value={country.name} onChange={() => {}} disabled />
           </div>
           {user && (
             <label className="mt-3 flex items-center gap-2 text-sm text-bark/80">
@@ -160,14 +221,25 @@ export default function Checkout() {
               Save this address to my profile
             </label>
           )}
+          {!isIndia(address.countryCode) && (
+            <p className="mt-3 text-xs text-bark/60">
+              International orders ship via DHL / FedEx Express. Duties &amp;
+              local taxes are collected by the carrier on delivery.
+            </p>
+          )}
         </section>
 
         <section className="card p-5">
           <h2 className="font-display text-lg font-semibold text-bark">
             Payment method
           </h2>
+          <div className="text-xs text-bark/60 mt-1">
+            {region === 'IN'
+              ? 'India rail · processed by Razorpay in production'
+              : 'Global rail · processed by Stripe / PayPal in production'}
+          </div>
           <div className="mt-3 grid gap-2 md:grid-cols-2">
-            {(['UPI', 'Card', 'Netbanking', 'COD'] as const).map((m) => (
+            {allowedPayments.map((m) => (
               <label
                 key={m}
                 className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition ${
@@ -184,26 +256,16 @@ export default function Checkout() {
                   name="payment"
                 />
                 <div>
-                  <div className="font-medium text-bark">
-                    {m === 'UPI' && 'UPI (GPay · PhonePe · Paytm)'}
-                    {m === 'Card' && 'Credit / Debit card'}
-                    {m === 'Netbanking' && 'Netbanking'}
-                    {m === 'COD' && 'Cash on Delivery'}
-                  </div>
-                  <div className="text-xs text-bark/60 mt-0.5">
-                    {m === 'UPI' &&
-                      'Instant · zero fees · recommended for Indian shoppers'}
-                    {m === 'Card' && 'Visa · Mastercard · RuPay · Amex · all secure'}
-                    {m === 'Netbanking' && 'All major Indian banks supported'}
-                    {m === 'COD' && '₹29 handling · pay when it arrives'}
-                  </div>
+                  <div className="font-medium text-bark">{PAYMENT_LABEL[m]}</div>
+                  <div className="text-xs text-bark/60 mt-0.5">{PAYMENT_HINT[m]}</div>
                 </div>
               </label>
             ))}
           </div>
           <p className="mt-3 text-xs text-bark/60">
-            Demo build — no real money moves. Wire this to Razorpay / Stripe in
-            production; see <code>docs/architecture.md</code>.
+            Demo build — no real money moves. Wire this to Razorpay (India) or
+            Stripe / PayPal (global) in production; see{' '}
+            <code>docs/architecture.md</code>.
           </p>
         </section>
       </div>
@@ -226,23 +288,44 @@ export default function Checkout() {
                   <div className="text-xs text-bark/60">Qty {l.qty}</div>
                 </div>
                 <div className="text-bark font-medium">
-                  {formatINR(p.priceMinor * l.qty)}
+                  {formatMoney(p.priceMinor * l.qty, country.currency)}
                 </div>
               </div>
             )
           })}
         </div>
         <div className="border-t border-bark/10 pt-3 space-y-1 text-sm">
-          <Row label="Subtotal" value={formatINR(subtotalMinor)} />
+          <Row
+            label="Subtotal"
+            value={formatMoney(subtotalMinor, country.currency)}
+          />
           <Row
             label={shippingMinor === 0 ? 'Shipping (free)' : 'Shipping'}
-            value={shippingMinor === 0 ? '—' : formatINR(shippingMinor)}
+            value={
+              shippingMinor === 0
+                ? '—'
+                : formatMoney(shippingMinor, country.currency)
+            }
           />
-          <Row label="GST (5%)" value={formatINR(taxMinor)} />
+          <Row
+            label={tax.label}
+            value={
+              tax.minor === 0
+                ? tax.note
+                  ? 'On delivery'
+                  : '—'
+                : formatMoney(tax.minor, country.currency)
+            }
+          />
           <div className="flex justify-between font-semibold text-bark pt-1">
             <span>Total</span>
-            <span>{formatINR(totalMinor)}</span>
+            <span>{formatMoney(totalMinor, country.currency)}</span>
           </div>
+          {country.currency !== 'INR' && (
+            <div className="text-[11px] text-bark/50 pt-1">
+              ≈ {formatINR(totalMinor)} · indicative FX, locked at payment
+            </div>
+          )}
         </div>
         <button
           className="btn-primary w-full disabled:opacity-50"
@@ -252,8 +335,8 @@ export default function Checkout() {
           {placing
             ? 'Processing…'
             : payment === 'COD'
-              ? `Place order (${formatINR(totalMinor)})`
-              : `Pay ${formatINR(totalMinor)}`}
+              ? `Place order (${formatMoney(totalMinor, country.currency)})`
+              : `Pay ${formatMoney(totalMinor, country.currency)}`}
         </button>
       </aside>
     </div>
