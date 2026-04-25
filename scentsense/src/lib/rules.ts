@@ -25,7 +25,9 @@ export function rankFragrances(
     if (f.weather.includes(input.weather)) score += 2;
     if (f.intensity === input.intensity) score += 2;
     else if (
-      (input.intensity === "moderate" && f.intensity !== "light") ||
+      // "moderate" is adjacent to both "light" and "strong"; "light" and
+      // "strong" are only adjacent to "moderate" (never to each other).
+      input.intensity === "moderate" ||
       (input.intensity === "strong" && f.intensity === "moderate") ||
       (input.intensity === "light" && f.intensity === "moderate")
     ) {
