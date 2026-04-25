@@ -13,6 +13,17 @@ interface Store {
 
 const memoryStore: Store = { subscribers: [] };
 
+// Serialize file-based read-modify-write so two concurrent /api/subscribe
+// requests can't both decide an email is new and clobber each other on write.
+// Single Node process scope only (fine for local dev; on Vercel the FS path
+// is skipped entirely, see getStorePath below).
+let fileWriteQueue: Promise<unknown> = Promise.resolve();
+function withFileLock<T>(fn: () => Promise<T>): Promise<T> {
+  const next = fileWriteQueue.then(fn, fn);
+  fileWriteQueue = next.catch(() => undefined);
+  return next;
+}
+
 function getStorePath(): string | null {
   const custom = process.env.SUBSCRIBERS_FILE;
   if (custom && custom.trim().length > 0) return custom;
@@ -65,21 +76,23 @@ export async function addSubscriber(
 
   if (filePath) {
     try {
-      const store = await readStore(filePath);
-      const alreadyExisted = store.subscribers.some(
-        (s) => s.email === normalized,
-      );
-      if (!alreadyExisted) {
-        const sub: Subscriber = {
-          email: normalized,
-          source,
-          createdAt: new Date().toISOString(),
-        };
-        store.subscribers.push(sub);
-        await writeStore(filePath, store);
-        await postToWebhook(sub);
-      }
-      return { alreadyExisted, count: store.subscribers.length };
+      return await withFileLock(async () => {
+        const store = await readStore(filePath);
+        const alreadyExisted = store.subscribers.some(
+          (s) => s.email === normalized,
+        );
+        if (!alreadyExisted) {
+          const sub: Subscriber = {
+            email: normalized,
+            source,
+            createdAt: new Date().toISOString(),
+          };
+          store.subscribers.push(sub);
+          await writeStore(filePath, store);
+          await postToWebhook(sub);
+        }
+        return { alreadyExisted, count: store.subscribers.length };
+      });
     } catch (err) {
       const code = (err as NodeJS.ErrnoException).code;
       // Fall through to in-memory path if the filesystem is read-only

@@ -15,7 +15,15 @@ const SEPHORA_REF = process.env.NEXT_PUBLIC_SEPHORA_REF || "scentsense";
 const DECANT_REF = process.env.NEXT_PUBLIC_DECANT_REF || "scentsense";
 
 function encodeQuery(f: Fragrance): string {
-  return encodeURIComponent(`${f.brand} ${f.name}`);
+  // The dataset's `name` field already includes the brand for nearly every
+  // entry (e.g. "Tom Ford Tobacco Vanille"). Concatenating brand again would
+  // produce "Tom Ford Tom Ford Tobacco Vanille" and degrade search quality.
+  // Fall back to "brand name" only when the brand is missing from the name.
+  const name = f.name;
+  if (f.brand && !name.toLowerCase().includes(f.brand.toLowerCase())) {
+    return encodeURIComponent(`${f.brand} ${name}`);
+  }
+  return encodeURIComponent(name);
 }
 
 function amazonLink(f: Fragrance): BuyLink {
