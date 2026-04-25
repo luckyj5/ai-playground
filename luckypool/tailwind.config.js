@@ -41,7 +41,9 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['"Playfair Display"', 'Inter', 'serif'],
+        // Display reuses Inter for a quieter, more readable headline voice.
+        // Visual hierarchy comes from size, weight and tracking — not a serif.
+        display: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Fira Code', 'ui-monospace', 'monospace'],
       },
       boxShadow: {

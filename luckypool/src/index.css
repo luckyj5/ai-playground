@@ -19,14 +19,21 @@ body {
     radial-gradient(ellipse 50% 40% at 95% 10%, rgba(31, 127, 63, 0.12), transparent 60%),
     linear-gradient(180deg, #0B0E16 0%, #07090F 55%, #05070B 100%);
   background-attachment: fixed;
+  font-feature-settings: 'cv11', 'ss01';
 }
 
-/* Crisper headings and scoreboard numerals */
+/* Subtler heading treatment — single sans family, weight + tracking carry
+   hierarchy instead of a heavy display serif. */
 h1,
 h2,
 h3,
 h4 {
-  letter-spacing: -0.015em;
+  letter-spacing: -0.022em;
+  font-weight: 600;
+}
+.font-display {
+  letter-spacing: -0.022em;
+  font-weight: 600;
 }
 
 @layer components {

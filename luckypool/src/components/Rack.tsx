@@ -114,11 +114,13 @@ export function Rack({
           />
         </>
       ) : null}
-      {/* Discipline-specific rack */}
+      {/* Discipline-specific rack. Apex (1-ball) sits on the foot spot at
+          ~3/4 of the table length and points toward the cue ball on the
+          breaking side (left). Triangle/diamond expands toward the foot rail. */}
       {discipline === '8-ball' ? (
-        <EightBallRack uid={uid} anchor={{ x: inner.x + inner.w * 0.72, y: inner.y + inner.h / 2 }} />
+        <EightBallRack uid={uid} apex={{ x: inner.x + inner.w * 0.62, y: inner.y + inner.h / 2 }} />
       ) : discipline === '9-ball' ? (
-        <NineBallRack uid={uid} anchor={{ x: inner.x + inner.w * 0.72, y: inner.y + inner.h / 2 }} />
+        <NineBallRack uid={uid} apex={{ x: inner.x + inner.w * 0.62, y: inner.y + inner.h / 2 }} />
       ) : (
         <SnookerBreak uid={uid} inner={inner} />
       )}
@@ -185,9 +187,11 @@ function Ball({
   );
 }
 
-// Standard 8-ball rack: 5 rows, 1 at apex, 8 in the center (row 3 middle),
-// corners are one solid and one stripe, rest alternate.
-const EIGHT_BALL_ROWS: number[][] = [
+// Standard 8-ball rack: 5 columns running from apex (left, 1-ball on the
+// foot spot) to the base row of 5 (right, against the foot rail).
+// 8 sits in the middle of column 2 (3rd column). Corners of the base row
+// are one solid (7) and one stripe (9) — opposite-corner rule.
+const EIGHT_BALL_COLS: number[][] = [
   [1],
   [11, 5],
   [2, 8, 10],
@@ -195,45 +199,45 @@ const EIGHT_BALL_ROWS: number[][] = [
   [7, 14, 3, 15, 9],
 ];
 
-function EightBallRack({ uid, anchor }: { uid: string; anchor: { x: number; y: number } }) {
+function EightBallRack({ uid, apex }: { uid: string; apex: { x: number; y: number } }) {
   const r = 11;
-  const dx = r * 2 + 0.5;
-  const dy = r * 1.8;
+  const dx = r * 1.8; // column-to-column spacing (rack tightening)
+  const dy = r * 2 + 0.5; // ball-to-ball within a column
   const balls: ReactElement[] = [];
-  EIGHT_BALL_ROWS.forEach((row, i) => {
-    const y = anchor.y + (i - 2) * dy;
-    const offset = (row.length - 1) / 2;
-    row.forEach((n, j) => {
-      const x = anchor.x + (j - offset) * dx;
+  EIGHT_BALL_COLS.forEach((col, i) => {
+    const x = apex.x + i * dx;
+    const offset = (col.length - 1) / 2;
+    col.forEach((n, j) => {
+      const y = apex.y + (j - offset) * dy;
       balls.push(<Ball key={`${i}-${j}`} uid={uid} cx={x} cy={y} r={r} n={n} />);
     });
   });
-  // Cue ball on break side
+  // Cue ball roughly on the head spot (~1/4 across), aimed at the rack apex.
   balls.unshift(
-    <Ball key="cue" uid={uid} cx={anchor.x - 150} cy={anchor.y} r={r} cue />,
+    <Ball key="cue" uid={uid} cx={apex.x - 150} cy={apex.y} r={r} cue />,
   );
   return <g>{balls}</g>;
 }
 
-// 9-ball diamond rack (1 at apex, 9 in center, 2-8 around).
-// Rows: 1 / 2,3 / 4,9,5 / 6,7 / 8
-const NINE_BALL_ROWS: number[][] = [[1], [2, 3], [4, 9, 5], [6, 7], [8]];
+// 9-ball diamond rack viewed from above: apex (1) on the foot spot at
+// left, 9 in the middle column, 2-8 around. Columns: 1 / 2,3 / 4,9,5 / 6,7 / 8.
+const NINE_BALL_COLS: number[][] = [[1], [2, 3], [4, 9, 5], [6, 7], [8]];
 
-function NineBallRack({ uid, anchor }: { uid: string; anchor: { x: number; y: number } }) {
+function NineBallRack({ uid, apex }: { uid: string; apex: { x: number; y: number } }) {
   const r = 12;
-  const dx = r * 2 + 0.5;
-  const dy = r * 1.8;
+  const dx = r * 1.8;
+  const dy = r * 2 + 0.5;
   const balls: ReactElement[] = [];
-  NINE_BALL_ROWS.forEach((row, i) => {
-    const y = anchor.y + (i - 2) * dy;
-    const offset = (row.length - 1) / 2;
-    row.forEach((n, j) => {
-      const x = anchor.x + (j - offset) * dx;
+  NINE_BALL_COLS.forEach((col, i) => {
+    const x = apex.x + i * dx;
+    const offset = (col.length - 1) / 2;
+    col.forEach((n, j) => {
+      const y = apex.y + (j - offset) * dy;
       balls.push(<Ball key={`${i}-${j}`} uid={uid} cx={x} cy={y} r={r} n={n} />);
     });
   });
   balls.unshift(
-    <Ball key="cue" uid={uid} cx={anchor.x - 150} cy={anchor.y} r={r} cue />,
+    <Ball key="cue" uid={uid} cx={apex.x - 150} cy={apex.y} r={r} cue />,
   );
   return <g>{balls}</g>;
 }
