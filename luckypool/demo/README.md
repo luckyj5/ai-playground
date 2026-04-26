@@ -19,7 +19,7 @@ Covers:
 
 The same walkthrough rendered against the **AngelBilliards** brand. The codebase
 on disk is still LuckyPool — for this recording the rebrand recipe in
-[`../CONTRIBUTING.md`](../CONTRIBUTING.md#renaming-the-brand) was applied to the
+[`../CONTRIBUTING.md`](../CONTRIBUTING.md#renaming-the-brand-luckypool--something-else) was applied to the
 working tree only (no commit), the demo was captured, then `git checkout --`
 reverted the source. The recording exists so you can compare what the product
 looks like under a different brand without committing the rebrand itself.
