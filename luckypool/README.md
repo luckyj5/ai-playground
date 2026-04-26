@@ -16,7 +16,10 @@ An end-to-end website for running **8-ball, 9-ball, and snooker** tournaments �
 6. [Design decisions & things considered](#design-decisions--things-considered)
 7. [Pending / parked items](#pending--parked-items)
 8. [Deployment: how & where](#deployment-how--where)
-9. [Parked product questions for Shubham](#parked-product-questions-for-shubham)
+9. [Renaming the brand](#renaming-the-brand)
+10. [Parked product questions for Shubham](#parked-product-questions-for-shubham)
+
+**Companion docs:** [`CONTRIBUTING.md`](./CONTRIBUTING.md) (dev workflow, code style, rebrand recipe) · [`DEPLOY.md`](./DEPLOY.md) (six provider walk-throughs) · [`GO_LIVE.md`](./GO_LIVE.md) ("I just bought a domain" → live in 10 minutes).
 
 ---
 
@@ -202,6 +205,12 @@ TL;DR — for a personal / small-team production deploy, use **Vercel**:
 ### When we add a backend
 
 Recommended: Fly.io or Render for the API (Node/Python/Rust — pick one), managed Postgres (Neon / Supabase), keep the frontend on Vercel. Static frontend → API domain via `VITE_API_URL` env var, which we should introduce as a placeholder (`.env.example`) even before the backend exists.
+
+## Renaming the brand
+
+If you want to ship under a different name (e.g. AngelBilliards), the brand strings `LuckyPool` (display) and `luckypool` (slug) live in a small set of well-defined places: `package.json`, `index.html`, the favicon, a handful of components (`Nav`, `Footer`, `Home`, `Venues`, `Players`), some seed data, and the docs themselves. The `localStorage` keys (`luckypool.tournaments.v1` etc.) are deliberately *not* renamed by default because that wipes existing user data — use a migration shim if your site already has users.
+
+Full recipe with one-shot `sed` commands and a verification grep is in [`CONTRIBUTING.md` § Renaming the brand](./CONTRIBUTING.md#renaming-the-brand-luckypool--something-else). Same recipe is referenced from [`GO_LIVE.md`](./GO_LIVE.md#step-7--going-live-with-a-new-brand) so you can rebrand *before* pointing your new domain at the deploy.
 
 ## Parked product questions for Shubham
 

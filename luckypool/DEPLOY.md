@@ -19,6 +19,9 @@ This guide covers:
 9. [Custom domain & HTTPS](#9-custom-domain--https)
 10. [Production hardening checklist](#10-production-hardening-checklist)
 11. [Backend readiness — what to plan for next](#11-backend-readiness--what-to-plan-for-next)
+12. [Renaming the brand before deploy](#12-renaming-the-brand-before-deploy)
+
+> **See also:** [`GO_LIVE.md`](./GO_LIVE.md) is the focused 10-minute walkthrough from "I just bought a domain" to a live HTTPS site on Vercel. [`CONTRIBUTING.md`](./CONTRIBUTING.md) has the full dev workflow + rebrand recipe.
 
 ---
 
@@ -552,3 +555,30 @@ on it:
 When that day comes, none of the deploy targets above need to change —
 you just add `VITE_API_URL` as an environment variable and update the
 hosts to allow the API origin in the CSP.
+
+---
+
+## 12. Renaming the brand before deploy
+
+If you bought a domain for a different name (`angelbilliards.com` etc.),
+rebrand the codebase **before** pointing the domain at the deploy.
+Otherwise the site will say `LuckyPool` while sitting at the new URL.
+
+The brand string `LuckyPool` (display) and `luckypool` (slug) live in
+~12 files: `package.json`, `index.html`, the favicon, a handful of
+components (`Nav`, `Footer`, `Home`, `Venues`, `Players`), some seed
+data, and the docs themselves.
+
+The full recipe (one-shot `sed`, verification grep, localStorage migration
+notes) is in
+[`CONTRIBUTING.md` § Renaming the brand](./CONTRIBUTING.md#renaming-the-brand-luckypool--something-else).
+The 60-second version is also inlined into
+[`GO_LIVE.md` § Step 7](./GO_LIVE.md#step-7--going-live-with-a-new-brand).
+
+**Critical caveat:** the `localStorage` keys (`luckypool.tournaments.v1`,
+`luckypool.matches.v1`, `luckypool.quickfire.v1`) are deliberately *not*
+renamed by the recipe. Renaming them wipes any data already stored in
+real users' browsers. If your site has live users, ship a one-shot
+migration shim that copies old → new and deletes old. If you're still
+pre-launch with no real users, just rename them and let the seed data
+re-hydrate.

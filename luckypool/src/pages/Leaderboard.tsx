@@ -4,37 +4,48 @@ import { Avatar } from '../components/Avatar';
 import type { Discipline } from '../types';
 import { globalStats, leaderboard } from '../data/stats';
 import { GLOBAL_QUICKFIRE, formatMs, useQuickfire } from '../data/quickfire';
+import { REAL_BOARDS } from '../data/realRankings';
 
-type Tab = 'all' | Discipline | 'quickfire';
+type Tab = 'all' | Discipline | 'quickfire' | 'world';
 
 const TABS: Array<{ id: Tab; label: string }> = [
   { id: 'all', label: 'Overall' },
   { id: '8-ball', label: '8-Ball' },
   { id: '9-ball', label: '9-Ball' },
   { id: 'snooker', label: 'Snooker' },
+  { id: 'world', label: 'World' },
   { id: 'quickfire', label: 'Quickfire' },
 ];
 
 export default function Leaderboard() {
   const [tab, setTab] = useState<Tab>('all');
+  const [worldBoardId, setWorldBoardId] = useState<string>(REAL_BOARDS[0].id);
   const stats = globalStats();
   const { record } = useQuickfire();
 
-  const rows = tab === 'quickfire' ? null : leaderboard(tab);
-  const rankedBoard = tab === 'quickfire'
-    ? (() => {
-        const board = [...GLOBAL_QUICKFIRE];
-        if (record.bestMs !== null) {
-          board.push({
-            player: 'You',
-            country: '—',
-            ms: record.bestMs,
-            at: new Date().toISOString().slice(0, 10),
-          });
-        }
-        return board.sort((a, b) => a.ms - b.ms);
-      })()
-    : null;
+  const board =
+    tab === 'world'
+      ? REAL_BOARDS.find((b) => b.id === worldBoardId) ?? REAL_BOARDS[0]
+      : null;
+
+  const rows =
+    tab === 'quickfire' || tab === 'world' ? null : leaderboard(tab);
+
+  const rankedQuickfire =
+    tab === 'quickfire'
+      ? (() => {
+          const list = [...GLOBAL_QUICKFIRE];
+          if (record.bestMs !== null) {
+            list.push({
+              player: 'You',
+              country: '—',
+              ms: record.bestMs,
+              at: new Date().toISOString().slice(0, 10),
+            });
+          }
+          return list.sort((a, b) => a.ms - b.ms);
+        })()
+      : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
@@ -44,8 +55,8 @@ export default function Leaderboard() {
           <h1 className="section-title mt-1">Compare, compete, come back tomorrow</h1>
           <p className="section-sub">
             Rolling rankings across all three disciplines, plus the global
-            9-Ball Quickfire board. Week-over-week deltas refresh every
-            Monday.
+            9-Ball Quickfire board and live snapshots of WPA, World Snooker,
+            and BCA tour standings.
           </p>
         </div>
         <Link to="/play" className="btn-primary">
@@ -84,6 +95,32 @@ export default function Leaderboard() {
           </button>
         ))}
       </div>
+
+      {/* World sub-tabs */}
+      {tab === 'world' ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {REAL_BOARDS.map((b) => (
+            <button
+              key={b.id}
+              onClick={() => setWorldBoardId(b.id)}
+              className={`chip ${
+                worldBoardId === b.id
+                  ? 'border-cue-accent/40 bg-chalk/10 text-chalk'
+                  : 'text-chalk-muted'
+              }`}
+            >
+              {b.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      {tab === 'world' && board ? (
+        <div className="mt-2 text-xs text-chalk-muted">
+          {board.scope} · Source: {board.source} · Snapshot {board.asOf} ·
+          Unit: {board.unit}
+        </div>
+      ) : null}
 
       {/* Table */}
       <div className="card mt-4 overflow-hidden">
@@ -150,6 +187,53 @@ export default function Leaderboard() {
               ))}
             </tbody>
           </table>
+        ) : tab === 'world' && board ? (
+          <table className="w-full text-sm">
+            <thead className="bg-ink-soft/60 text-xs uppercase tracking-wider text-chalk-muted">
+              <tr>
+                <th className="px-4 py-3 text-left w-12">Rank</th>
+                <th className="px-4 py-3 text-left">Player</th>
+                <th className="px-4 py-3 text-left">Region</th>
+                <th className="px-4 py-3 text-right">{board.unit}</th>
+                <th className="px-4 py-3 text-right">Δ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {board.rows.map((row) => (
+                <tr
+                  key={`${board.id}-${row.rank}`}
+                  className="border-t border-chalk/10 hover:bg-chalk/[0.03]"
+                >
+                  <td className="px-4 py-3 font-mono text-chalk-muted">{row.rank}</td>
+                  <td className="px-4 py-3 font-medium text-chalk">{row.player}</td>
+                  <td className="px-4 py-3 text-chalk-muted">
+                    {row.region ?? row.notes ?? row.country}
+                    {row.region && row.country !== 'US' ? ` · ${row.country}` : ''}
+                  </td>
+                  <td className="px-4 py-3 text-right font-mono tabular-nums text-chalk">
+                    {row.points.toLocaleString()}
+                  </td>
+                  <td
+                    className={`px-4 py-3 text-right font-mono tabular-nums ${
+                      row.delta && row.delta > 0
+                        ? 'text-green-400'
+                        : row.delta && row.delta < 0
+                          ? 'text-red-400'
+                          : 'text-chalk-muted'
+                    }`}
+                  >
+                    {row.delta == null
+                      ? '—'
+                      : row.delta > 0
+                        ? `▲ ${row.delta}`
+                        : row.delta < 0
+                          ? `▼ ${-row.delta}`
+                          : '—'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         ) : (
           <table className="w-full text-sm">
             <thead className="bg-ink-soft/60 text-xs uppercase tracking-wider text-chalk-muted">
@@ -162,7 +246,7 @@ export default function Leaderboard() {
               </tr>
             </thead>
             <tbody>
-              {rankedBoard!.map((row, i) => {
+              {rankedQuickfire!.map((row, i) => {
                 const isYou = row.player === 'You';
                 return (
                   <tr
