@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useOrders } from '../store/OrdersContext'
-import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import { usePrefs } from '../store/PrefsContext'
 
 export default function Orders() {
   const { orders } = useOrders()
+  const { currency: prefCurrency } = usePrefs()
 
   if (orders.length === 0) {
     return (
@@ -50,7 +52,7 @@ export default function Orders() {
             </div>
             <div className="text-right">
               <div className="font-semibold text-bark">
-                {formatINR(o.totalMinor)}
+                {formatMoney(o.totalMinor, o.currency ?? prefCurrency)}
               </div>
               <div className="text-xs text-terracotta-600 font-medium capitalize">
                 {o.status.replace('_', ' ')}

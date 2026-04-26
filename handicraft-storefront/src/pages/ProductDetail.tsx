@@ -1,14 +1,17 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useCatalog } from '../store/CatalogContext'
 import { useCart } from '../store/CartContext'
-import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import { usePrefs } from '../store/PrefsContext'
 import ProductCard from '../components/ProductCard'
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>()
   const { getById, products } = useCatalog()
   const { add } = useCart()
+  const { currency } = usePrefs()
   const navigate = useNavigate()
+  const fmt = (m: number) => formatMoney(m, currency)
   const product = id ? getById(id) : undefined
 
   if (!product) {
@@ -53,16 +56,15 @@ export default function ProductDetail() {
 
           <div className="mt-3 flex items-baseline gap-3">
             <span className="text-2xl font-semibold text-bark">
-              {formatINR(product.priceMinor)}
+              {fmt(product.priceMinor)}
             </span>
             {product.mrpMinor && product.mrpMinor > product.priceMinor && (
               <>
                 <span className="text-sm text-bark/50 line-through">
-                  {formatINR(product.mrpMinor)}
+                  {fmt(product.mrpMinor)}
                 </span>
                 <span className="text-sm font-medium text-terracotta-600">
-                  Save{' '}
-                  {formatINR(product.mrpMinor - product.priceMinor)}
+                  Save {fmt(product.mrpMinor - product.priceMinor)}
                 </span>
               </>
             )}

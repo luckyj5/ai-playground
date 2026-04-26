@@ -13,8 +13,8 @@ const EMPTY_ADDRESS: Address = {
   city: '',
   state: '',
   pincode: '',
-  countryCode: 'IN',
-  country: 'India',
+  countryCode: 'US',
+  country: 'United States',
 }
 
 export default function Profile() {

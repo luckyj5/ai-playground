@@ -2,11 +2,15 @@ import { Link } from 'react-router-dom'
 import { useCart } from '../store/CartContext'
 import { useCatalog } from '../store/CatalogContext'
 import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import { usePrefs } from '../store/PrefsContext'
 
 export default function Cart() {
   const { lines, setQty, remove, subtotalMinor, shippingMinor, taxMinor, totalMinor } =
     useCart()
   const { getById } = useCatalog()
+  const { currency } = usePrefs()
+  const fmt = (m: number) => formatMoney(m, currency)
 
   if (lines.length === 0) {
     return (
@@ -74,10 +78,10 @@ export default function Cart() {
                 </div>
                 <div className="text-right">
                   <div className="font-semibold text-bark">
-                    {formatINR(p.priceMinor * line.qty)}
+                    {fmt(p.priceMinor * line.qty)}
                   </div>
                   <div className="text-xs text-bark/50">
-                    {formatINR(p.priceMinor)} each
+                    {fmt(p.priceMinor)} each
                   </div>
                 </div>
               </div>
@@ -89,20 +93,35 @@ export default function Cart() {
       <aside className="card p-5 h-fit sticky top-20">
         <h2 className="font-display text-lg font-semibold text-bark">Summary</h2>
         <div className="mt-3 space-y-2 text-sm">
-          <Row label="Subtotal" value={formatINR(subtotalMinor)} />
+          <Row label="Subtotal" value={fmt(subtotalMinor)} />
           <Row
-            label={shippingMinor === 0 ? 'Shipping (free)' : 'Shipping'}
-            value={shippingMinor === 0 ? '—' : formatINR(shippingMinor)}
+            label={
+              shippingMinor === 0 ? 'Estimated shipping (free)' : 'Estimated shipping'
+            }
+            value={shippingMinor === 0 ? '—' : fmt(shippingMinor)}
           />
-          <Row label="GST (5%)" value={formatINR(taxMinor)} />
+          <Row
+            label={currency === 'INR' ? 'Estimated GST (5%)' : 'Est. duties & taxes'}
+            value={
+              currency === 'INR'
+                ? fmt(taxMinor)
+                : taxMinor === 0
+                  ? 'On delivery'
+                  : fmt(taxMinor)
+            }
+          />
           <div className="border-t border-bark/10 pt-2 mt-2 flex justify-between font-semibold text-bark">
-            <span>Total</span>
-            <span>{formatINR(totalMinor)}</span>
+            <span>Estimated total</span>
+            <span>{fmt(totalMinor)}</span>
           </div>
+          {currency !== 'INR' && (
+            <div className="text-[11px] text-bark/50">
+              ≈ {formatINR(totalMinor)} · final FX locked at checkout
+            </div>
+          )}
           <p className="text-[11px] text-bark/50 pt-2">
-            Shipping outside India? Pick your country at checkout — we’ll
-            recompute shipping, taxes and switch to your local currency
-            (USD, GBP, EUR, AUD, CAD, AED, SGD, JPY).
+            Final shipping &amp; taxes are computed at checkout based on your
+            ship-to country. Switch currency from the header at any time.
           </p>
         </div>
         <Link to="/checkout" className="btn-primary w-full mt-5">

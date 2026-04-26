@@ -30,17 +30,17 @@ export const COUNTRIES: ReadonlyArray<{
   name: string
   currency: Currency
 }> = [
-  { code: 'IN', name: 'India', currency: 'INR' },
   { code: 'US', name: 'United States', currency: 'USD' },
   { code: 'GB', name: 'United Kingdom', currency: 'GBP' },
+  { code: 'CA', name: 'Canada', currency: 'CAD' },
   { code: 'DE', name: 'Germany', currency: 'EUR' },
   { code: 'FR', name: 'France', currency: 'EUR' },
   { code: 'NL', name: 'Netherlands', currency: 'EUR' },
   { code: 'AU', name: 'Australia', currency: 'AUD' },
-  { code: 'CA', name: 'Canada', currency: 'CAD' },
   { code: 'AE', name: 'United Arab Emirates', currency: 'AED' },
   { code: 'SG', name: 'Singapore', currency: 'SGD' },
   { code: 'JP', name: 'Japan', currency: 'JPY' },
+  { code: 'IN', name: 'India', currency: 'INR' },
   { code: 'OTHER', name: 'Other (international)', currency: 'USD' },
 ]
 

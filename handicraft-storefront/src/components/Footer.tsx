@@ -34,10 +34,10 @@ export default function Footer() {
         <div>
           <div className="label">Help</div>
           <ul className="space-y-1 text-sm text-bark/70">
-            <li>Free shipping over ₹1,500</li>
-            <li>7-day easy returns</li>
-            <li>UPI · Cards · PayPal · Apple/Google Pay · COD</li>
-            <li>Worldwide shipping</li>
+            <li>Worldwide shipping · 5–10 days global, 3–7 days in India</li>
+            <li>Free shipping in India over ₹1,500 · free intl. over ₹10,000</li>
+            <li>Cards · PayPal · Apple/Google Pay · UPI · COD (IN)</li>
+            <li>7-day easy returns with pickup</li>
             <li>hello@anantacrafts.in</li>
           </ul>
         </div>

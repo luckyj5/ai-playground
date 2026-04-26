@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import type { Product } from '../types'
-import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import { usePrefs } from '../store/PrefsContext'
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { currency } = usePrefs()
   const discount =
     product.mrpMinor && product.mrpMinor > product.priceMinor
       ? Math.round(
@@ -38,11 +40,11 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="text-xs text-bark/60 mt-0.5">{product.origin}</div>
         <div className="mt-2 flex items-baseline gap-2">
           <span className="text-lg font-semibold text-bark">
-            {formatINR(product.priceMinor)}
+            {formatMoney(product.priceMinor, currency)}
           </span>
           {product.mrpMinor && product.mrpMinor > product.priceMinor && (
             <span className="text-xs text-bark/50 line-through">
-              {formatINR(product.mrpMinor)}
+              {formatMoney(product.mrpMinor, currency)}
             </span>
           )}
         </div>

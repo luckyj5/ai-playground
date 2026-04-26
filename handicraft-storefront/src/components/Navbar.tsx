@@ -1,10 +1,17 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useCart } from '../store/CartContext'
 import { useAuth } from '../store/AuthContext'
+import { usePrefs } from '../store/PrefsContext'
+import { COUNTRIES, type Currency } from '../lib/regions'
+
+const CURRENCY_OPTIONS: Currency[] = Array.from(
+  new Set(COUNTRIES.map((c) => c.currency)),
+)
 
 export default function Navbar() {
   const { itemCount } = useCart()
   const { user } = useAuth()
+  const { currency, setCurrency } = usePrefs()
 
   const linkBase = 'px-3 py-2 text-sm font-medium rounded-full'
   const linkActive = 'text-terracotta-600 bg-terracotta-50'
@@ -53,6 +60,18 @@ export default function Navbar() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <select
+            aria-label="Display currency"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value as Currency)}
+            className="hidden sm:block text-xs font-medium text-bark/80 bg-transparent border border-bark/15 rounded-full px-2 py-1.5 hover:bg-bark/5 focus:outline-none focus:ring-2 focus:ring-terracotta-300"
+          >
+            {CURRENCY_OPTIONS.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
           <NavLink
             to="/profile"
             className={({ isActive }) =>

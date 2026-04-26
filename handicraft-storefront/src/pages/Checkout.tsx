@@ -28,8 +28,8 @@ const EMPTY_ADDRESS: Address = {
   city: '',
   state: '',
   pincode: '',
-  countryCode: 'IN',
-  country: 'India',
+  countryCode: 'US',
+  country: 'United States',
 }
 
 export default function Checkout() {
@@ -45,8 +45,8 @@ export default function Checkout() {
       ? {
           ...EMPTY_ADDRESS,
           ...seedAddr,
-          countryCode: seedAddr.countryCode ?? 'IN',
-          country: seedAddr.country ?? 'India',
+          countryCode: seedAddr.countryCode ?? 'US',
+          country: seedAddr.country ?? 'United States',
           name: seedAddr.name || user?.name || '',
         }
       : { ...EMPTY_ADDRESS, name: user?.name ?? '' },

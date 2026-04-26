@@ -32,9 +32,9 @@ export default function Home() {
               </Link>
             </div>
             <div className="mt-6 text-sm text-bark/60 flex flex-wrap gap-x-6 gap-y-1">
-              <span>✓ Free shipping over ₹1,500</span>
+              <span>✓ Worldwide shipping · 5–10 days global, 3–7 days in India</span>
               <span>✓ 7-day easy returns</span>
-              <span>✓ UPI · Cards · PayPal · Apple/Google Pay · COD</span>
+              <span>✓ Card · PayPal · Apple/Google Pay · UPI · COD (IN)</span>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">

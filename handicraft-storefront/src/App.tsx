@@ -3,6 +3,7 @@ import { AuthProvider } from './store/AuthContext'
 import { CatalogProvider } from './store/CatalogContext'
 import { CartProvider } from './store/CartContext'
 import { OrdersProvider } from './store/OrdersContext'
+import { PrefsProvider } from './store/PrefsContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import Home from './pages/Home'
@@ -19,6 +20,7 @@ import Returns from './pages/Returns'
 
 export default function App() {
   return (
+    <PrefsProvider>
     <AuthProvider>
       <CatalogProvider>
         <CartProvider>
@@ -56,5 +58,6 @@ export default function App() {
         </CartProvider>
       </CatalogProvider>
     </AuthProvider>
+    </PrefsProvider>
   )
 }

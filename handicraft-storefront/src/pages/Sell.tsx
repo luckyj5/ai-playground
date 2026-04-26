@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useCatalog } from '../store/CatalogContext'
-import { formatINR } from '../lib/currency'
+import { formatMoney } from '../lib/regions'
+import { usePrefs } from '../store/PrefsContext'
 
 export default function Sell() {
   const { products, updateProduct, deleteProduct } = useCatalog()
+  const { currency } = usePrefs()
   const myProducts = products
 
   return (
@@ -52,7 +54,7 @@ export default function Sell() {
               </div>
               <div className="mt-2 flex items-center gap-3">
                 <span className="font-semibold text-bark">
-                  {formatINR(p.priceMinor)}
+                  {formatMoney(p.priceMinor, currency)}
                 </span>
                 <button
                   className="text-xs text-bark/70 hover:text-terracotta-600"
