@@ -189,52 +189,19 @@ Tracked here so nothing gets lost. Priority is my rough guess — adjust as you 
 
 ## Deployment: how & where
 
-Because the app builds to a fully static SPA (no SSR, no backend calls yet), any static host works. Recommended paths in priority order:
+LuckyPool is a static Vite SPA — `npm run build` produces a self-contained `dist/` you can host anywhere. Full guide with copy-pasteable configs for **Vercel, Netlify, Cloudflare Pages, GitHub Pages, AWS S3+CloudFront, and Docker/Nginx (any VPS / Fly / Render / Railway / DO App Platform)** is in [`DEPLOY.md`](./DEPLOY.md).
 
-### Option A — Devin static deploy (easiest, good for previews)
+TL;DR — for a personal / small-team production deploy, use **Vercel**:
 
-From this VM:
+1. Sign in at [vercel.com](https://vercel.com/), import the repo, accept the auto-detected Vite settings (`npm run build`, output `dist`).
+2. Commit a one-line `vercel.json` for SPA routing: `{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }`.
+3. Add your custom domain under Settings → Domains.
 
-```bash
-cd /home/ubuntu/repos/ai-playground/luckypool
-npm run build
-# Then hand the `dist/` directory to the Devin `deploy` tool (command="frontend", dir=".../luckypool/dist").
-```
-
-This gives you a public `*.devinapps.com` URL in seconds. Good for sharing with friends and for QA.
-
-### Option B — Vercel (recommended for production)
-
-1. `vercel link` the `luckypool` directory (framework preset: **Vite**).
-2. Build command: `npm run build`, output dir: `dist`, install command: `npm install`.
-3. Add a `vercel.json` rewrite so client-side routes (e.g. `/tournaments/:id`) resolve to `index.html`:
-   ```json
-   { "rewrites": [{ "source": "/(.*)", "destination": "/" }] }
-   ```
-4. Connect the GitHub repo; every PR gets a preview URL automatically.
-5. Point `luckypool.com` (or whatever domain you want) at Vercel and add it as a custom domain.
-
-Because the `ai-playground` repo is a monorepo, set the Vercel **Root Directory** to `luckypool` so Vercel doesn't try to build the siblings.
-
-### Option C — Netlify / Cloudflare Pages
-
-Same story as Vercel — just set the build command to `npm run build`, publish directory to `dist`, and add a `_redirects` file (`/* /index.html 200`) for SPA routing.
-
-### Option D — S3 + CloudFront
-
-For full AWS control:
-
-```bash
-npm run build
-aws s3 sync dist/ s3://<bucket>/ --delete
-aws cloudfront create-invalidation --distribution-id <id> --paths "/*"
-```
-
-Add a CloudFront function or `errorPagePath: /index.html` so deep links resolve.
+**Should LuckyPool live in its own repo?** Yes — see [`DEPLOY.md` §1](./DEPLOY.md#1-should-luckypool-live-in-its-own-repo) for the migration recipe (`git subtree split` preserves history). Subfolder still works if you set the provider's Root Directory to `luckypool`.
 
 ### When we add a backend
 
-Recommended: Fly.io or Render for the API (Node/Python/Rust — pick one), managed Postgres (Neon / Supabase), and keep the frontend on Vercel. Static frontend → API domain via `VITE_API_URL` env var, which we should introduce now as a placeholder (`.env.example`) even before the backend exists.
+Recommended: Fly.io or Render for the API (Node/Python/Rust — pick one), managed Postgres (Neon / Supabase), keep the frontend on Vercel. Static frontend → API domain via `VITE_API_URL` env var, which we should introduce as a placeholder (`.env.example`) even before the backend exists.
 
 ## Parked product questions for Shubham
 
