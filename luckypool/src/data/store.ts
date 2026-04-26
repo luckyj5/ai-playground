@@ -1,5 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { matches as seedMatches, tournaments as seedTournaments } from './mock';
+import { resetQuickfire } from './quickfire';
 import type { Match, Tournament } from '../types';
 
 const TOURNEYS_KEY = 'luckypool.tournaments.v1';
@@ -99,9 +100,13 @@ export function useMatches(): [
   return [state, update];
 }
 
+// Wipe every LuckyPool localStorage key back to the seed dataset and notify
+// all subscribers. The button in TournamentBuilder advertises this as a
+// global reset, so it must clear the Quickfire record too.
 export function resetAll() {
   save(TOURNEYS_KEY, seedTournaments);
   save(MATCHES_KEY, seedMatches);
   emitChange(TOURNEYS_KEY);
   emitChange(MATCHES_KEY);
+  resetQuickfire();
 }

@@ -79,6 +79,13 @@ export function useQuickfire(): {
   return { record, submit, reset };
 }
 
+// Imperative reset for callers outside React (e.g. the global "Reset demo
+// data" button in store.ts::resetAll). Wipes the persisted record and
+// notifies any subscribed components.
+export function resetQuickfire() {
+  commit(INITIAL);
+}
+
 // Seeded "global" leaderboard so the user has something to chase. These are
 // fictional but deliberately tight so a good run can crack the top 5.
 export const GLOBAL_QUICKFIRE: Array<{
