@@ -194,7 +194,7 @@ export default function TournamentBuilder() {
                 onChange={(e) =>
                   setDraft((d) => ({
                     ...d,
-                    raceTo: Number(e.target.value) || 1,
+                    raceTo: Math.max(1, Math.min(99, Math.floor(Number(e.target.value) || 1))),
                   }))
                 }
               />
